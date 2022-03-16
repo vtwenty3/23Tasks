@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
+  FlatList,
   Text,
   StyleSheet,
   View,
@@ -11,47 +12,121 @@ import {
   ToastAndroid,
   ImageBackground,
 } from 'react-native';
+import {Appbar, Button} from 'react-native-paper';
+
 import GlobalStyle from '../GlobalStyle';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import Task from '../Elements/task';
+import firestore from '@react-native-firebase/firestore';
+import Todo from './Todo';
 
 export default function Home({navigation}) {
   const [AddMenu, SetAddMenu] = useState(false);
+
+  const [todo, setTodo] = useState('');
+  const ref = firestore().collection('tasksDatabase');
+
+  const [loading, setLoading] = useState(true);
+  const [todos, setTodos] = useState([]);
+
+  // useEffect(() => {
+  //   return ref.onSnapshot(querySnapshot => {
+  //     const list = [];
+  //     querySnapshot.forEach(doc => {
+  //       list.push({
+  //         title: doc.data().title,
+  //         complete: doc.data().complete,
+  //       });
+  //     });
+  //     setList(list);
+  //   });
+  // }, []);
+
+  useEffect(() => {
+    return ref.onSnapshot(querySnapshot => {
+      const list = [];
+      querySnapshot.forEach(doc => {
+        const {title, complete} = doc.data();
+        list.push({
+          id: doc.id,
+          title,
+          complete,
+        });
+      });
+
+      setTodos(list);
+
+      if (loading) {
+        setLoading(false);
+      }
+    });
+  }, []);
+
+  async function addTodo() {
+    //writing to firabase
+    console.log(todo, '1');
+    if (todo.length == 0) {
+      //err handling
+      alert('Please provide a title!');
+      return;
+    }
+    await ref.add({
+      //add the fileds
+      title: todo,
+      complete: false,
+    });
+    setTodo(''); //clearing the TitleText
+  }
+
   const onPressHandler = () => {
     SetAddMenu(true);
   };
+
+  if (loading) {
+    return null; // or a spinner
+  }
+
   return (
     <ImageBackground
       source={require('../../assets/back.png')}
       style={styles.body}>
       <View style={styles.body}>
+        <FlatList
+          style={{flex: 1}}
+          data={todos}
+          keyExtractor={item => item.id}
+          renderItem={({item}) => <Todo {...item} />}
+        />
+
         <Modal
           visible={AddMenu}
+          animationType={'fade'}
           onRequestClose={() => SetAddMenu(false)}
           transparent>
           <View style={styles.addMenuParent}>
             <View style={styles.addMenu}>
               <TextInput
                 style={styles.addMenuTitle}
-                placeholder="Task title"></TextInput>
+                placeholder="Task title"
+                value={todo}
+                onChangeText={setTodo}></TextInput>
               <TextInput
                 style={styles.addMenuDescription}
                 placeholder="Description"></TextInput>
-              <TouchableOpacity style={styles.btnText}>
+              <TouchableOpacity
+                disabled={todo.length === 0}
+                style={styles.btnText}
+                onPress={addTodo}>
                 <Text> Create Task </Text>
               </TouchableOpacity>
             </View>
           </View>
         </Modal>
 
-        <Text style={[GlobalStyle.CustomFont, styles.text]}>Home</Text>
+        {/* <Text style={[GlobalStyle.CustomFont, styles.text]}>Home</Text> */}
 
-        <TouchableOpacity style={styles.addBtn}>
-          <FontAwesome5
-            name={'lightbulb'}
-            size={30}
-            color={'#FECA8C'}
-            onPress={onPressHandler}
-          />
+        <TouchableOpacity style={styles.addBtn} onPress={onPressHandler}>
+          <FontAwesome5 name={'lightbulb'} size={30} color={'#FECA8C'} />
         </TouchableOpacity>
       </View>
     </ImageBackground>
@@ -61,9 +136,9 @@ export default function Home({navigation}) {
 const styles = StyleSheet.create({
   body: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
   },
+
   text: {
     fontFamily: 'Poppins-Thin',
     fontSize: 40,

@@ -15,6 +15,7 @@ import Settings from './src/Screens/Settings';
 import Tasks from './src/Screens/Done';
 import Home from './src/Screens/Home';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import {DefaultTheme, DarkTheme} from '@react-navigation/native';
 
 const Tab = createBottomTabNavigator();
 
@@ -25,7 +26,7 @@ function App() {
     //   style={styles.background}
     // >
 
-    <NavigationContainer>
+    <NavigationContainer theme={DarkTheme}>
       <Tab.Navigator
         screenOptions={({route}) => ({
           tabBarIcon: ({focused, size, color}) => {

@@ -1,32 +1,26 @@
-import React from "react";
-import { Text, StyleSheet, TouchableOpacity } from "react-native";
+import React from 'react';
+import {Text, StyleSheet, TouchableOpacity} from 'react-native';
 
-const MyButton = (props) => {
+const Task = props => {
   return (
     <TouchableOpacity
       style={styles.tBtn}
       onPress={props.pressFunction}
-      activeOpacity={0.6}
-    >
+      activeOpacity={0.6}>
       <Text>{props.btnTitle}</Text>
     </TouchableOpacity>
   );
 };
-
-//submitted ? "Clear" : "Submit"
-
 const styles = StyleSheet.create({
-  tBtn: {
-    width: 100,
+  element: {
+    marginTop: 10,
+    width: 350,
     height: 30,
-    alignItems: "center",
-    backgroundColor: "grey",
-    borderRadius: 10,
-    borderColor: "black",
+    backgroundColor: '#999999',
+    borderColor: '#4d4d4d',
     borderWidth: 2,
-    justifyContent: "center",
-    margin: 5,
+    borderRadius: 5,
   },
 });
 
-export default MyButton;
+export default Task;
