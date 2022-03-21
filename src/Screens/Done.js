@@ -19,14 +19,15 @@ import Todo from '../Elements/Todo';
 export default function Done({navigation}) {
   const [todo, setTodo] = useState('');
 
-  const ref = firestore()
+  const ref = firestore().collection('tasksDatabase');
+  const toDelete = firestore()
     .collection('tasksDatabase')
-    .where('complete', '==', false);
+    .where('complete', '==', true);
   const [loading, setLoading] = useState(true);
   const [todos, setTodos] = useState([]);
 
   useEffect(() => {
-    return ref.onSnapshot(querySnapshot => {
+    return toDelete.onSnapshot(querySnapshot => {
       const list = [];
       querySnapshot.forEach(doc => {
         const {title, complete} = doc.data();
@@ -47,13 +48,20 @@ export default function Done({navigation}) {
     navigation.navigate('Settings');
   };
 
-  // const deleteAll = () => {
-  //   return ref.onSnapshot(querySnapshot => {
-  //     querySnapshot.forEach(doc => {
-  //       // doc.ref.delete();
-  //     });
-  //   });
-  // };
+  const deleteAll = () => {
+    cont = true;
+    toDelete.onSnapshot(querySnapshot => {
+      querySnapshot.forEach(doc => {
+        if (cont) {
+          doc.ref.delete();
+        }
+        if (querySnapshot.size == 1) {
+          cont = false;
+          return console.log('Deletion Terminated');
+        }
+      });
+    });
+  };
   return (
     <ImageBackground
       source={require('../../assets/back.png')}
@@ -92,7 +100,7 @@ export default function Done({navigation}) {
         {/* <Text style={[GlobalStyle.CustomFont, styles.text]}>Home</Text> */}
 
         {/* bulb button */}
-        <TouchableOpacity style={styles.addBtn}>
+        <TouchableOpacity style={styles.addBtn} onPress={deleteAll}>
           <FontAwesome5 name={'trash'} size={30} color={'#FECA8C'} />
         </TouchableOpacity>
       </View>

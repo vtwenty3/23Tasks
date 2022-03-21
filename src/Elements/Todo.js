@@ -33,7 +33,7 @@ function Todo({id, title, complete}) {
       <View style={styles.icon}>
         <TouchableOpacity onPress={() => toggleComplete()}>
           <FontAwesome5
-            name={complete ? 'check' : 'redo'}
+            name={complete ? 'redo' : 'check'}
             size={23}
             color={'#FECA8C'}
           />

@@ -24,13 +24,16 @@ export default function Home({navigation}) {
   //declare db and write handler
   const [todo, setTodo] = useState('');
   const ref = firestore().collection('tasksDatabase');
+  const toComplete = firestore()
+    .collection('tasksDatabase')
+    .where('complete', '==', false);
 
   //todos list handler
   const [loading, setLoading] = useState(true);
   const [todos, setTodos] = useState([]);
 
   useEffect(() => {
-    return ref.onSnapshot(querySnapshot => {
+    return toComplete.onSnapshot(querySnapshot => {
       const list = [];
       querySnapshot.forEach(doc => {
         const {title, complete} = doc.data();
