@@ -14,6 +14,9 @@ import MyButton from './src/Elements/elCustomButton';
 import Settings from './src/Screens/Settings';
 import Tasks from './src/Screens/Done';
 import Home from './src/Screens/Home';
+import Notes from './src/Screens/Notes';
+import Upcoming from './src/Screens/Upcoming';
+
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {DefaultTheme, DarkTheme} from '@react-navigation/native';
 
@@ -32,15 +35,21 @@ function App() {
           tabBarIcon: ({focused, size, color}) => {
             let iconName;
             if (route.name === 'Settings') {
-              iconName = 'toolbox';
+              iconName = 'cog';
               size = focused ? 25 : 20;
               // color = focused ? '#f0f' : '#555';
             } else if (route.name === 'Done') {
-              iconName = 'trash';
+              iconName = 'check-circle';
               size = focused ? 25 : 20;
               // color = focused ? '#f0f' : '#555';
             } else if (route.name === 'Home') {
-              iconName = 'home';
+              iconName = focused ? 'lightbulb' : 'home';
+              size = focused ? 27 : 20;
+            } else if (route.name === 'Upcoming') {
+              iconName = 'calendar-day';
+              size = focused ? 25 : 20;
+            } else if (route.name === 'Notes') {
+              iconName = 'edit';
               size = focused ? 25 : 20;
             }
             return <FontAwesome5 name={iconName} size={size} color={color} />;
@@ -50,7 +59,9 @@ function App() {
         inactiveColor="#3e2465"
         barStyle={{backgroundColor: '#694fad'}}>
         <Tab.Screen name="Settings" component={Settings} />
+        <Tab.Screen name="Notes" component={Notes} />
         <Tab.Screen name="Home" component={Home} />
+        <Tab.Screen name="Upcoming" component={Upcoming} />
         <Tab.Screen name="Done" component={Tasks} />
       </Tab.Navigator>
     </NavigationContainer>

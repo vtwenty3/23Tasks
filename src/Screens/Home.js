@@ -1,3 +1,4 @@
+//Home Screen, Building Page, Functionality of Todo in elements/Todo
 import React, {useState, useEffect} from 'react';
 import {
   FlatList,
@@ -7,40 +8,26 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
-  Pressable,
-  Alert,
-  ToastAndroid,
   ImageBackground,
 } from 'react-native';
-import {Appbar, Button} from 'react-native-paper';
 
 import GlobalStyle from '../GlobalStyle';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import Task from '../Elements/task';
 import firestore from '@react-native-firebase/firestore';
-import Todo from './Todo';
+import Todo from '../Elements/Todo';
 
 export default function Home({navigation}) {
+  //modal event handler
+
   const [AddMenu, SetAddMenu] = useState(false);
 
+  //declare db and write handler
   const [todo, setTodo] = useState('');
   const ref = firestore().collection('tasksDatabase');
 
+  //todos list handler
   const [loading, setLoading] = useState(true);
   const [todos, setTodos] = useState([]);
-
-  // useEffect(() => {
-  //   return ref.onSnapshot(querySnapshot => {
-  //     const list = [];
-  //     querySnapshot.forEach(doc => {
-  //       list.push({
-  //         title: doc.data().title,
-  //         complete: doc.data().complete,
-  //       });
-  //     });
-  //     setList(list);
-  //   });
-  // }, []);
 
   useEffect(() => {
     return ref.onSnapshot(querySnapshot => {
@@ -53,9 +40,7 @@ export default function Home({navigation}) {
           complete,
         });
       });
-
       setTodos(list);
-
       if (loading) {
         setLoading(false);
       }
@@ -75,7 +60,7 @@ export default function Home({navigation}) {
       title: todo,
       complete: false,
     });
-    setTodo(''); //clearing the TitleText
+    setTodo(''); //clearing the Todo text
   }
 
   const onPressHandler = () => {
@@ -83,7 +68,7 @@ export default function Home({navigation}) {
   };
 
   if (loading) {
-    return null; // or a spinner
+    return null;
   }
 
   return (
@@ -91,13 +76,17 @@ export default function Home({navigation}) {
       source={require('../../assets/back.png')}
       style={styles.body}>
       <View style={styles.body}>
-        <FlatList
-          style={{flex: 1}}
-          data={todos}
-          keyExtractor={item => item.id}
-          renderItem={({item}) => <Todo {...item} />}
-        />
+        {/* ToDo Elements in a flat list, actual element in todo.js  */}
+        <View style={styles.listaBe}>
+          <FlatList
+            style={styles.flatList}
+            data={todos}
+            keyExtractor={item => item.id}
+            renderItem={({item}) => <Todo {...item} />}
+          />
+        </View>
 
+        {/* Add to do modal */}
         <Modal
           visible={AddMenu}
           animationType={'fade'}
@@ -125,6 +114,7 @@ export default function Home({navigation}) {
 
         {/* <Text style={[GlobalStyle.CustomFont, styles.text]}>Home</Text> */}
 
+        {/* bulb button */}
         <TouchableOpacity style={styles.addBtn} onPress={onPressHandler}>
           <FontAwesome5 name={'lightbulb'} size={30} color={'#FECA8C'} />
         </TouchableOpacity>
@@ -138,7 +128,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
-
   text: {
     fontFamily: 'Poppins-Thin',
     fontSize: 40,
