@@ -15,6 +15,7 @@ import GlobalStyle from '../GlobalStyle';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import firestore from '@react-native-firebase/firestore';
 import Todo from '../Elements/Todo';
+import {setDisabled} from 'react-native/Libraries/LogBox/Data/LogBoxData';
 
 export default function Home({navigation}) {
   //modal event handler
@@ -23,11 +24,34 @@ export default function Home({navigation}) {
 
   //declare db and write handler
   const [todo, setTodo] = useState('');
+  const [description, setDescription] = useState('');
+
+  const [today, setToday] = useState(true);
+  const [tommorrow, setTommorrow] = useState(false);
+  const [someday, setSomeday] = useState(false);
+
+  const taskToday = () => {
+    setToday(true);
+    setTommorrow(false);
+    setSomeday(false);
+  };
+
+  const taskTommorrow = () => {
+    setToday(false);
+    setTommorrow(true);
+    setSomeday(false);
+  };
+  const taskSomeday = () => {
+    setToday(false);
+    setTommorrow(false);
+    setSomeday(true);
+  };
+
   const ref = firestore().collection('tasksDatabase');
   const toComplete = firestore()
     .collection('tasksDatabase')
-    .where('complete', '==', false);
-
+    .where('complete', '==', false)
+    .where('tommorrow', '==', false);
   //todos list handler
   const [loading, setLoading] = useState(true);
   const [todos, setTodos] = useState([]);
@@ -62,12 +86,22 @@ export default function Home({navigation}) {
       //add the fileds
       title: todo,
       complete: false,
+      description: description,
+      today: today,
+      tommorrow: tommorrow,
+      someday: someday,
+      dateCreated: new Date(),
     });
-    setTodo(''); //clearing the Todo text
+    setTodo('');
+    setDescription(''); //clearing the Todo text
   }
 
   const onPressHandler = () => {
     SetAddMenu(true);
+  };
+
+  const dummy = () => {
+    console.log('ha, u pressed a button');
   };
 
   if (loading) {
@@ -95,22 +129,53 @@ export default function Home({navigation}) {
           animationType={'fade'}
           onRequestClose={() => SetAddMenu(false)}
           transparent>
-          <View style={styles.addMenuParent}>
-            <View style={styles.addMenu}>
+          <View style={styles.modal}>
+            <View style={styles.modalWrapper}>
               <TextInput
-                style={styles.addMenuTitle}
+                style={styles.modalTitle}
                 placeholder="Task title"
                 value={todo}
                 onChangeText={setTodo}></TextInput>
               <TextInput
-                style={styles.addMenuDescription}
-                placeholder="Description"></TextInput>
-              <TouchableOpacity
-                disabled={todo.length === 0}
-                style={styles.btnText}
-                onPress={addTodo}>
-                <Text> Create Task </Text>
-              </TouchableOpacity>
+                style={styles.modalDescription}
+                placeholder="Description"
+                value={description}
+                onChangeText={setDescription}></TextInput>
+
+              <View style={styles.modalWrapperTimeButtons}>
+                <TouchableOpacity
+                  style={[today ? styles.btnClicked : styles.btnUnclicked]}
+                  onPress={taskToday}>
+                  <Text style={styles.modalTextTimeButtons}>Today</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[tommorrow ? styles.btnClicked : styles.btnUnclicked]}
+                  onPress={taskTommorrow}>
+                  <Text>Tommorrow</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[someday ? styles.btnClicked : styles.btnUnclicked]}
+                  onPress={taskSomeday}>
+                  <Text>Someday</Text>
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.modalWrapperCreateCancel}>
+                <TouchableOpacity
+                  style={styles.modalBtnCreateCancel}
+                  onPress={() => SetAddMenu(false)}>
+                  <Text style={styles.modalBtnTextCreateCancel}>Close</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  disabled={todo.length === 0}
+                  style={styles.modalBtnCreateCancel}
+                  onPress={addTodo}>
+                  <Text style={styles.modalBtnTextCreateCancel}>Create</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </Modal>
@@ -148,20 +213,20 @@ const styles = StyleSheet.create({
     bottom: 5,
     elevation: 5,
   },
-  addMenuParent: {
+  modal: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.28)',
   },
-  addMenu: {
+  modalWrapper: {
     width: '90%',
     backgroundColor: '#3b3c3d',
     borderRadius: 7,
     margin: 10,
   },
-  addMenuTitle: {
-    borderColor: 'white',
+  modalTitle: {
+    borderColor: 'grey',
     borderWidth: 1,
     borderRadius: 7,
     margin: 10,
@@ -169,9 +234,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'grey',
     elevation: 5,
   },
-  addMenuDescription: {
+  modalDescription: {
     height: 150,
-    borderColor: 'white',
+    borderColor: 'grey',
     borderWidth: 1,
     borderRadius: 7,
     margin: 10,
@@ -179,14 +244,53 @@ const styles = StyleSheet.create({
     backgroundColor: 'grey',
     elevation: 5,
   },
-  btnText: {
+
+  modalBtnCreateCancel: {
     justifyContent: 'center',
     alignItems: 'center',
-    margin: 10,
     backgroundColor: 'grey',
-    marginLeft: '33%',
-    marginRight: '33%',
     borderRadius: 3,
     height: 30,
+    paddingLeft: 30,
+    paddingRight: 30,
+    margin: 10,
+  },
+
+  modalBtnTextCreateCancel: {
+    fontFamily: 'Poppins-SemiBold',
+  },
+
+  modalWrapperCreateCancel: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  modalWrapperTimeButtons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  btnClicked: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FECA8C',
+    borderRadius: 3,
+    height: 30,
+    paddingLeft: 10,
+    paddingRight: 10,
+    margin: 10,
+  },
+
+  btnUnclicked: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'grey',
+    borderRadius: 3,
+    height: 30,
+    paddingLeft: 10,
+    paddingRight: 10,
+    margin: 10,
   },
 });

@@ -9,6 +9,7 @@ import {
   Modal,
   TextInput,
   ImageBackground,
+  str,
 } from 'react-native';
 
 import GlobalStyle from '../GlobalStyle';
@@ -17,6 +18,13 @@ import firestore from '@react-native-firebase/firestore';
 import Todo from '../Elements/Todo';
 
 export default function Done({navigation}) {
+  // const date = () => {
+  //   let today = String(new Date());
+  //   let day = today.substring(8, 10);
+
+  //   console.log(today, ' today: ', day);
+  // };
+
   const [todo, setTodo] = useState('');
 
   const ref = firestore().collection('tasksDatabase');
@@ -103,6 +111,10 @@ export default function Done({navigation}) {
         <TouchableOpacity style={styles.addBtn} onPress={deleteAll}>
           <FontAwesome5 name={'trash'} size={30} color={'#FECA8C'} />
         </TouchableOpacity>
+        {/* 
+        <TouchableOpacity style={styles.dateBtn} onPress={date}>
+          <FontAwesome5 name={'calendar'} size={30} color={'#FECA8C'} />
+        </TouchableOpacity> */}
       </View>
     </ImageBackground>
   );
@@ -129,6 +141,19 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 15,
     right: 15,
+    elevation: 5,
+  },
+
+  dateBtn: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#636363',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: 15,
+    left: 15,
     elevation: 5,
   },
   addMenuParent: {
