@@ -5,8 +5,9 @@ import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import GlobalStyle from '../GlobalStyle';
 import {deleteDoc, doc, getDoc, setDoc} from '@react-native-firebase/firestore';
+import _objectWithoutProperties from '@babel/runtime/helpers/objectWithoutProperties';
 
-export default function Todo({id, title, complete}) {
+export default function Todo(props) {
   async function deleteToDo() {
     const users = await firestore().collection('tasksDatabase').get();
     console.log(users.forEach);
@@ -25,11 +26,13 @@ export default function Todo({id, title, complete}) {
 
     <View style={styles.element}>
       <View style={styles.icon}>
-        <TouchableOpacity onPress={() => toggleComplete()}>
-          <FontAwesome5 name="check" size={23} color={'#FECA8C'} />
+        <TouchableOpacity onPress={props.elFunction}>
+          <FontAwesome5 name={props.elIcon} size={23} color={'#FECA8C'} />
         </TouchableOpacity>
       </View>
-      <Text style={[styles.elementText, GlobalStyle.LightFont]}>{title}</Text>
+      <Text style={[styles.elementText, GlobalStyle.LightFont]}>
+        {props.title}
+      </Text>
     </View>
   );
 }

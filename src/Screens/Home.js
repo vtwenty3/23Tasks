@@ -14,7 +14,7 @@ import {
 import GlobalStyle from '../GlobalStyle';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import firestore from '@react-native-firebase/firestore';
-import Todo from '../Elements/Todo';
+import Todo2 from '../Elements/Todo2';
 import {setDisabled} from 'react-native/Libraries/LogBox/Data/LogBoxData';
 
 export default function Home({navigation}) {
@@ -82,6 +82,7 @@ export default function Home({navigation}) {
       alert('Please provide a title!');
       return;
     }
+
     await ref.add({
       //add the fileds
       title: todo,
@@ -94,6 +95,12 @@ export default function Home({navigation}) {
     });
     setTodo('');
     setDescription(''); //clearing the Todo text
+  }
+
+  async function toggleComplete(id, complete) {
+    await firestore().collection('tasksDatabase').doc(id).update({
+      complete: !complete,
+    });
   }
 
   const onPressHandler = () => {
@@ -119,7 +126,14 @@ export default function Home({navigation}) {
             style={styles.flatList}
             data={todos}
             keyExtractor={item => item.id}
-            renderItem={({item}) => <Todo {...item} />}
+            renderItem={({item}) => (
+              <Todo2
+                title={item.title}
+                id={item.id}
+                elFunction={() => toggleComplete(item.id, item.complete)}
+                elIcon={'check'}
+              />
+            )}
           />
         </View>
 

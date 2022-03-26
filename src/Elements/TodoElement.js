@@ -2,16 +2,15 @@ import React from 'react';
 import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import GlobalStyle from '../GlobalStyle';
-
-const todoElement = props => {
+const Element = props => {
   return (
     <View style={styles.element}>
       <View style={styles.icon}>
-        <TouchableOpacity onPress={props.pressFunction}>
-          <FontAwesome5 name={props.iconName} size={23} color={'#FECA8C'} />
+        <TouchableOpacity onPress={props.elFunction}>
+          <FontAwesome5 name={props.elIcon} size={23} color={'#FECA8C'} />
         </TouchableOpacity>
       </View>
-      <Text style={[styles.elementText, GlobalStyle.LightFont]}> {title} </Text>
+      <Text style={[styles.elementText, GlobalStyle.LightFont]}>{title}</Text>
     </View>
   );
 };
@@ -50,4 +49,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default todoElement;
+export default Element;

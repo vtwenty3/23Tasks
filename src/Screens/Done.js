@@ -15,7 +15,7 @@ import {
 import GlobalStyle from '../GlobalStyle';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import firestore from '@react-native-firebase/firestore';
-import Todo from '../Elements/Todo';
+import Todo2 from '../Elements/Todo2';
 
 export default function Done({navigation}) {
   // const date = () => {
@@ -56,6 +56,12 @@ export default function Done({navigation}) {
     navigation.navigate('Settings');
   };
 
+  async function toggleComplete(id, complete) {
+    await firestore().collection('tasksDatabase').doc(id).update({
+      complete: !complete,
+    });
+  }
+
   const deleteAll = () => {
     cont = true;
     toDelete.onSnapshot(querySnapshot => {
@@ -81,7 +87,14 @@ export default function Done({navigation}) {
             style={styles.flatList}
             data={todos}
             keyExtractor={item => item.id}
-            renderItem={({item}) => <Todo {...item} />}
+            renderItem={({item}) => (
+              <Todo2
+                title={item.title}
+                id={item.id}
+                elFunction={() => toggleComplete(item.id, item.complete)}
+                elIcon={'redo'}
+              />
+            )}
           />
         </View>
 

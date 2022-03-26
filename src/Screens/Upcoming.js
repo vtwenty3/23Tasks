@@ -15,7 +15,7 @@ import {
 import GlobalStyle from '../GlobalStyle';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import firestore from '@react-native-firebase/firestore';
-import Todo from '../Elements/Todo';
+import Todo2 from '../Elements/Todo2';
 
 export default function Upcoming({navigation}) {
   // const date = () => {
@@ -55,8 +55,15 @@ export default function Upcoming({navigation}) {
   }, []);
 
   const showMe = () => {
-    console.log(upcoming.doc.title);
+    console.log('hehe');
   };
+
+  async function moveToToday(id, tommorrow) {
+    console.log('activate');
+    await firestore().collection('tasksDatabase').doc(id).update({
+      tommorrow: false,
+    });
+  }
 
   const deleteAll = () => {
     cont = true;
@@ -83,7 +90,15 @@ export default function Upcoming({navigation}) {
             style={styles.flatList}
             data={todos}
             keyExtractor={item => item.id}
-            renderItem={({item}) => <Todo {...item} />}
+            renderItem={({item}) => (
+              <Todo2
+                title={item.title}
+                id={item.id}
+                tommorow={item.tommorow}
+                elFunction={() => moveToToday(item.id, item.tommorow)}
+                elIcon={'arrow-circle-up'}
+              />
+            )}
           />
         </View>
 
