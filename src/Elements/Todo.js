@@ -11,7 +11,11 @@ export default function Todo({id, title, complete}) {
     const users = await firestore().collection('tasksDatabase').get();
     console.log(users.forEach);
   }
-
+  async function toggleComplete() {
+    await firestore().collection('tasksDatabase').doc(id).update({
+      complete: !complete,
+    });
+  }
   return (
     // <List.Item
     //   style={styles.element}

@@ -16,15 +16,14 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import firestore from '@react-native-firebase/firestore';
 import Todo2 from '../Elements/Todo2';
 import {setDisabled} from 'react-native/Libraries/LogBox/Data/LogBoxData';
-
+import ModalElements from '../Elements/ModalElements';
 export default function Home({navigation}) {
   //modal event handler
-
-  const [AddMenu, SetAddMenu] = useState(false);
 
   //declare db and write handler
   const [todo, setTodo] = useState('');
   const [description, setDescription] = useState('');
+  const [AddMenu, SetAddMenu] = useState(false);
 
   const [today, setToday] = useState(true);
   const [tommorrow, setTommorrow] = useState(false);
@@ -138,7 +137,8 @@ export default function Home({navigation}) {
         </View>
 
         {/* Add to do modal */}
-        <Modal
+
+        {/* <Modal
           visible={AddMenu}
           animationType={'fade'}
           onRequestClose={() => SetAddMenu(false)}
@@ -192,9 +192,20 @@ export default function Home({navigation}) {
               </View>
             </View>
           </View>
-        </Modal>
+        </Modal> */}
 
         {/* <Text style={[GlobalStyle.CustomFont, styles.text]}>Home</Text> */}
+
+        <Modal
+          style={styles.modalitself}
+          visible={AddMenu}
+          animationType={'fade'}
+          onRequestClose={() => SetAddMenu(false)}
+          transparent>
+          <View style={styles.modal}>
+            <ModalElements confirmBtnProp={() => addTodo} />
+          </View>
+        </Modal>
 
         {/* bulb button */}
         <TouchableOpacity style={styles.addBtn} onPress={onPressHandler}>
@@ -237,74 +248,6 @@ const styles = StyleSheet.create({
     width: '90%',
     backgroundColor: '#3b3c3d',
     borderRadius: 7,
-    margin: 10,
-  },
-  modalTitle: {
-    borderColor: 'grey',
-    borderWidth: 1,
-    borderRadius: 7,
-    margin: 10,
-    fontSize: 20,
-    backgroundColor: 'grey',
-    elevation: 5,
-  },
-  modalDescription: {
-    height: 150,
-    borderColor: 'grey',
-    borderWidth: 1,
-    borderRadius: 7,
-    margin: 10,
-    fontSize: 12,
-    backgroundColor: 'grey',
-    elevation: 5,
-  },
-
-  modalBtnCreateCancel: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'grey',
-    borderRadius: 3,
-    height: 30,
-    paddingLeft: 30,
-    paddingRight: 30,
-    margin: 10,
-  },
-
-  modalBtnTextCreateCancel: {
-    fontFamily: 'Poppins-SemiBold',
-  },
-
-  modalWrapperCreateCancel: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  modalWrapperTimeButtons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  btnClicked: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FECA8C',
-    borderRadius: 3,
-    height: 30,
-    paddingLeft: 10,
-    paddingRight: 10,
-    margin: 10,
-  },
-
-  btnUnclicked: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'grey',
-    borderRadius: 3,
-    height: 30,
-    paddingLeft: 10,
-    paddingRight: 10,
     margin: 10,
   },
 });

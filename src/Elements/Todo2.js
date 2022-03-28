@@ -13,6 +13,10 @@ export default function Todo(props) {
     console.log(users.forEach);
   }
 
+  const showMe = () => {
+    console.log('hehe');
+  };
+
   return (
     // <List.Item
     //   style={styles.element}
@@ -23,17 +27,18 @@ export default function Todo(props) {
     //     <List.Icon {...props} icon={complete ? 'check' : 'cancel'} />
     //   )}
     // />
-
-    <View style={styles.element}>
-      <View style={styles.icon}>
-        <TouchableOpacity onPress={props.elFunction}>
-          <FontAwesome5 name={props.elIcon} size={23} color={'#FECA8C'} />
-        </TouchableOpacity>
+    <TouchableOpacity onPress={showMe}>
+      <View style={styles.element}>
+        <View style={styles.icon}>
+          <TouchableOpacity onPress={props.elFunction}>
+            <FontAwesome5 name={props.elIcon} size={23} color={'#FECA8C'} />
+          </TouchableOpacity>
+        </View>
+        <Text style={[styles.elementText, GlobalStyle.LightFont]}>
+          {props.title}
+        </Text>
       </View>
-      <Text style={[styles.elementText, GlobalStyle.LightFont]}>
-        {props.title}
-      </Text>
-    </View>
+    </TouchableOpacity>
   );
 }
 
