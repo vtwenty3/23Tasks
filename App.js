@@ -16,7 +16,8 @@ import Tasks from './src/Screens/Done';
 import Home from './src/Screens/Home';
 import Notes from './src/Screens/Notes';
 import Upcoming from './src/Screens/Upcoming';
-
+import Add from './src/Screens/Add';
+import {createStackNavigator} from 'react-navigation-stack';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {DefaultTheme, DarkTheme} from '@react-navigation/native';
 

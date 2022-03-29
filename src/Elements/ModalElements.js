@@ -101,6 +101,8 @@ export default function ModalElements(props) {
           </TouchableOpacity>
         </View>
 
+        {/* CLOSE BUTTON */}
+
         <View style={styles.modalWrapperCreateCancel}>
           <TouchableOpacity
             style={styles.modalBtnCreateCancel}

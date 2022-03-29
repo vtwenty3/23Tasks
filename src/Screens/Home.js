@@ -1,4 +1,3 @@
-//Home Screen, Building Page, Functionality of Todo in elements/Todo
 import React, {useState, useEffect} from 'react';
 import {
   FlatList,
@@ -16,18 +15,21 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import firestore from '@react-native-firebase/firestore';
 import Todo2 from '../Elements/Todo2';
 import {setDisabled} from 'react-native/Libraries/LogBox/Data/LogBoxData';
-import ModalElements from '../Elements/ModalElements';
+
 export default function Home({navigation}) {
   //modal event handler
+
+  const [AddMenu, SetAddMenu] = useState(false);
 
   //declare db and write handler
   const [todo, setTodo] = useState('');
   const [description, setDescription] = useState('');
-  const [AddMenu, SetAddMenu] = useState(false);
 
   const [today, setToday] = useState(true);
   const [tommorrow, setTommorrow] = useState(false);
   const [someday, setSomeday] = useState(false);
+  const [add, setAdd] = useState(true);
+  const [itemEdit, setItemEdit] = useState('');
 
   const taskToday = () => {
     setToday(true);
@@ -92,8 +94,7 @@ export default function Home({navigation}) {
       someday: someday,
       dateCreated: new Date(),
     });
-    setTodo('');
-    setDescription(''); //clearing the Todo text
+    clear();
   }
 
   async function toggleComplete(id, complete) {
@@ -114,6 +115,63 @@ export default function Home({navigation}) {
     return null;
   }
 
+  async function LoadInfo(id) {
+    console.log('in Load Info');
+    const cityRef = firestore().collection('tasksDatabase').doc(id);
+    const doc = await cityRef.get();
+    if (!doc.exists) {
+      console.log('No such document!');
+    } else {
+      console.log('Document data:', doc.data());
+      setTodo(doc.data().title);
+      setDescription(doc.data().description);
+      setToday(doc.data().today);
+      setTommorrow(doc.data().tommorrow);
+      setSomeday(doc.data().someday);
+      SetAddMenu(true);
+      setAdd(false);
+      setItemEdit(id);
+      console.log(itemEdit);
+    }
+  }
+
+  function UpdateInfo(id) {
+    console.log('in UPDATE Info');
+    firestore().collection('tasksDatabase').doc(id).update({
+      title: todo,
+      description: description,
+      today: today,
+      tommorrow: tommorrow,
+      someday: someday,
+    });
+    clear();
+  }
+
+  function addAndClear() {
+    addTodo;
+    clear;
+  }
+
+  async function Load(doc) {
+    setTodo(doc.data().title);
+    setDescription(doc.data().description);
+    setToday(doc.data().today);
+    setTommorrow(doc.data().tommorrow);
+    setSomeday(doc.data().someday);
+    SetAddMenu(true);
+  }
+
+  const clear = () => {
+    console.log('Clearing Iniciated...');
+    SetAddMenu(false);
+    setTodo('');
+    setDescription('');
+    setToday(true);
+    setTommorrow(false);
+    setSomeday(false);
+    setAdd(true);
+  };
+
   return (
     <ImageBackground
       source={require('../../assets/back.png')}
@@ -127,6 +185,7 @@ export default function Home({navigation}) {
             keyExtractor={item => item.id}
             renderItem={({item}) => (
               <Todo2
+                loadInfo={() => LoadInfo(item.id)}
                 title={item.title}
                 id={item.id}
                 elFunction={() => toggleComplete(item.id, item.complete)}
@@ -137,11 +196,10 @@ export default function Home({navigation}) {
         </View>
 
         {/* Add to do modal */}
-
-        {/* <Modal
+        <Modal
           visible={AddMenu}
           animationType={'fade'}
-          onRequestClose={() => SetAddMenu(false)}
+          onRequestClose={clear}
           transparent>
           <View style={styles.modal}>
             <View style={styles.modalWrapper}>
@@ -179,33 +237,22 @@ export default function Home({navigation}) {
               <View style={styles.modalWrapperCreateCancel}>
                 <TouchableOpacity
                   style={styles.modalBtnCreateCancel}
-                  onPress={() => SetAddMenu(false)}>
+                  onPress={clear}>
                   <Text style={styles.modalBtnTextCreateCancel}>Close</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   disabled={todo.length === 0}
                   style={styles.modalBtnCreateCancel}
-                  onPress={addTodo}>
-                  <Text style={styles.modalBtnTextCreateCancel}>Create</Text>
+                  onPress={add ? addTodo : () => UpdateInfo(itemEdit)}>
+                  <Text style={styles.modalBtnTextCreateCancel}>Confirm</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
-        </Modal> */}
+        </Modal>
 
         {/* <Text style={[GlobalStyle.CustomFont, styles.text]}>Home</Text> */}
-
-        <Modal
-          style={styles.modalitself}
-          visible={AddMenu}
-          animationType={'fade'}
-          onRequestClose={() => SetAddMenu(false)}
-          transparent>
-          <View style={styles.modal}>
-            <ModalElements confirmBtnProp={() => addTodo} />
-          </View>
-        </Modal>
 
         {/* bulb button */}
         <TouchableOpacity style={styles.addBtn} onPress={onPressHandler}>
@@ -248,6 +295,74 @@ const styles = StyleSheet.create({
     width: '90%',
     backgroundColor: '#3b3c3d',
     borderRadius: 7,
+    margin: 10,
+  },
+  modalTitle: {
+    borderColor: 'grey',
+    borderWidth: 1,
+    borderRadius: 7,
+    margin: 10,
+    fontSize: 20,
+    backgroundColor: 'grey',
+    elevation: 5,
+  },
+  modalDescription: {
+    height: 150,
+    borderColor: 'grey',
+    borderWidth: 1,
+    borderRadius: 7,
+    margin: 10,
+    fontSize: 12,
+    backgroundColor: 'grey',
+    elevation: 5,
+  },
+
+  modalBtnCreateCancel: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'grey',
+    borderRadius: 3,
+    height: 30,
+    paddingLeft: 30,
+    paddingRight: 30,
+    margin: 10,
+  },
+
+  modalBtnTextCreateCancel: {
+    fontFamily: 'Poppins-SemiBold',
+  },
+
+  modalWrapperCreateCancel: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  modalWrapperTimeButtons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  btnClicked: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FECA8C',
+    borderRadius: 3,
+    height: 30,
+    paddingLeft: 10,
+    paddingRight: 10,
+    margin: 10,
+  },
+
+  btnUnclicked: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'grey',
+    borderRadius: 3,
+    height: 30,
+    paddingLeft: 10,
+    paddingRight: 10,
     margin: 10,
   },
 });

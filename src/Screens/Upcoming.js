@@ -62,6 +62,7 @@ export default function Upcoming({navigation}) {
     console.log('activate');
     await firestore().collection('tasksDatabase').doc(id).update({
       tommorrow: false,
+      today: true,
     });
   }
 

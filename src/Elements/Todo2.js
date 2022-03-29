@@ -27,7 +27,7 @@ export default function Todo(props) {
     //     <List.Icon {...props} icon={complete ? 'check' : 'cancel'} />
     //   )}
     // />
-    <TouchableOpacity onPress={showMe}>
+    <TouchableOpacity onPress={props.loadInfo}>
       <View style={styles.element}>
         <View style={styles.icon}>
           <TouchableOpacity onPress={props.elFunction}>
