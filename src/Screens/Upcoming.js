@@ -9,30 +9,18 @@ import {
   Modal,
   TextInput,
   ImageBackground,
-  str,
 } from 'react-native';
 
-import GlobalStyle from '../GlobalStyle';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import firestore from '@react-native-firebase/firestore';
 import Todo2 from '../Elements/Todo2';
 
 export default function Upcoming({navigation}) {
-  // const date = () => {
-  //   let today = String(new Date());
-  //   let day = today.substring(8, 10);
-
-  //   console.log(today, ' today: ', day);
-  // };
-
-  const [todo, setTodo] = useState('');
-
-  const ref = firestore().collection('tasksDatabase');
   const upcoming = firestore()
     .collection('tasksDatabase')
     .where('tommorrow', '==', true)
     .where('complete', '==', false);
-
+  const [todo, setTodo] = useState('');
   const [loading, setLoading] = useState(true);
   const [todos, setTodos] = useState([]);
 
@@ -104,7 +92,6 @@ export default function Upcoming({navigation}) {
         </View>
 
         {/* Add to do modal */}
-
         <View style={styles.addMenuParent}>
           <View style={styles.addMenu}>
             <TextInput
@@ -123,8 +110,6 @@ export default function Upcoming({navigation}) {
           </View>
         </View>
 
-        {/* <Text style={[GlobalStyle.CustomFont, styles.text]}>Home</Text> */}
-
         {/* bulb button */}
         <TouchableOpacity style={styles.addBtn} onPress={deleteAll}>
           <FontAwesome5 name={'trash'} size={30} color={'#FECA8C'} />
@@ -132,10 +117,6 @@ export default function Upcoming({navigation}) {
         <TouchableOpacity style={styles.addBtn2} onPress={showMe}>
           <FontAwesome5 name={'trash'} size={30} color={'#FECA8C'} />
         </TouchableOpacity>
-        {/* 
-        <TouchableOpacity style={styles.dateBtn} onPress={date}>
-          <FontAwesome5 name={'calendar'} size={30} color={'#FECA8C'} />
-        </TouchableOpacity> */}
       </View>
     </ImageBackground>
   );

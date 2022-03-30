@@ -10,26 +10,30 @@ import {
   ImageBackground,
 } from 'react-native';
 
-import GlobalStyle from '../GlobalStyle';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import firestore from '@react-native-firebase/firestore';
 import Todo2 from '../Elements/Todo2';
-import {setDisabled} from 'react-native/Libraries/LogBox/Data/LogBoxData';
 
 export default function Home({navigation}) {
-  //modal event handler
-
-  const [AddMenu, SetAddMenu] = useState(false);
-
-  //declare db and write handler
-  const [todo, setTodo] = useState('');
+  const [AddMenu, SetAddMenu] = useState(false); //modal event handler
+  const [todo, setTodo] = useState(''); //title of todo
   const [description, setDescription] = useState('');
-
+  //properties which indicate the desired location of the task (upcoming, done, home)
   const [today, setToday] = useState(true);
   const [tommorrow, setTommorrow] = useState(false);
   const [someday, setSomeday] = useState(false);
-  const [add, setAdd] = useState(true);
-  const [itemEdit, setItemEdit] = useState('');
+  const [add, setAdd] = useState(true); //add or edit state, true = add, false = edit
+  const [itemEdit, setItemEdit] = useState(''); //storing the id of the doc, global access
+  const [loading, setLoading] = useState(true);
+  const [todos, setTodos] = useState([]);
+
+  //creating instances of the database, showin only tasks with (complete, tommorow) = false
+  const ref = firestore().collection('tasksDatabase');
+  const toComplete = firestore()
+    .collection('tasksDatabase')
+    .where('complete', '==', false)
+    .where('tommorrow', '==', false);
+  //todos list handler
 
   const taskToday = () => {
     setToday(true);
@@ -42,20 +46,12 @@ export default function Home({navigation}) {
     setTommorrow(true);
     setSomeday(false);
   };
+
   const taskSomeday = () => {
     setToday(false);
     setTommorrow(false);
     setSomeday(true);
   };
-
-  const ref = firestore().collection('tasksDatabase');
-  const toComplete = firestore()
-    .collection('tasksDatabase')
-    .where('complete', '==', false)
-    .where('tommorrow', '==', false);
-  //todos list handler
-  const [loading, setLoading] = useState(true);
-  const [todos, setTodos] = useState([]);
 
   useEffect(() => {
     return toComplete.onSnapshot(querySnapshot => {
@@ -97,22 +93,18 @@ export default function Home({navigation}) {
     clear();
   }
 
-  async function toggleComplete(id, complete) {
-    await firestore().collection('tasksDatabase').doc(id).update({
-      complete: !complete,
-    });
+  if (loading) {
+    return null;
   }
 
   const onPressHandler = () => {
     SetAddMenu(true);
   };
 
-  const dummy = () => {
-    console.log('ha, u pressed a button');
-  };
-
-  if (loading) {
-    return null;
+  async function toggleComplete(id, complete) {
+    await firestore().collection('tasksDatabase').doc(id).update({
+      complete: !complete,
+    });
   }
 
   async function LoadInfo(id) {
@@ -145,20 +137,6 @@ export default function Home({navigation}) {
       someday: someday,
     });
     clear();
-  }
-
-  function addAndClear() {
-    addTodo;
-    clear;
-  }
-
-  async function Load(doc) {
-    setTodo(doc.data().title);
-    setDescription(doc.data().description);
-    setToday(doc.data().today);
-    setTommorrow(doc.data().tommorrow);
-    setSomeday(doc.data().someday);
-    SetAddMenu(true);
   }
 
   const clear = () => {
