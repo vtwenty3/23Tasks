@@ -11,7 +11,8 @@ import {
 } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import firestore from '@react-native-firebase/firestore';
-import Todo2 from '../Elements/Todo2';
+import TagSelector from '../Elements/TagSelector';
+
 import {white} from 'react-native-paper/lib/typescript/styles/colors';
 
 export default function Notes({navigation}) {
@@ -21,16 +22,21 @@ export default function Notes({navigation}) {
   const [tagInput, setTagInput] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loading2, setLoading2] = useState(true);
-
   const [notes, setNotes] = useState([]);
-
   const [visible, setVisible] = useState(false);
   const [tagList, setTagList] = useState(['tag1', 'tag2', 'tag3']);
-  const noteRef = firestore().collection('notesDatabase');
-  const tagRef = firestore().collection('tagsDatabase');
+  const [tagListNote, setTagListNote] = useState(['tag1', 'tag2', 'tag3']);
+
   const [tagModal, setTagModal] = useState(false);
   const [tagId, setTagid] = useState('');
+  const [tagIdNote, setTagIdNote] = useState('');
+
   const [TagTitle, setTagTitle] = useState('');
+  const noteRef = firestore().collection('notesDatabase');
+  const tagRef = firestore().collection('tagsDatabase');
+  const [tagClicked, setTagClicked] = useState(false);
+  const [tagClicked2, setTagClicked2] = useState(false);
+  const [tagId2, setTagid2] = useState('');
 
   const clear = () => {
     console.log('Clearing Iniciated...');
@@ -41,36 +47,91 @@ export default function Notes({navigation}) {
   };
 
   //this is executed the items amount
-
-  const Item = ({title, id}) => (
-    <View style={styles.item}>
-      <TouchableOpacity onPress={() => Explorer(id)}>
-        <Text style={styles.tagText}>{title}</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
+  // when tag is clicked, return null, only render the selected one
+  const Item = ({title, id}) => {
+    if (tagClicked == true) {
+      if (visible) {
+        //const [tagIdNote, setTagIdNote] = useState('');
+        return (
+          <View style={styles.itemSelected}>
+            <TouchableOpacity onPress={() => selectTag(id)}>
+              <Text style={styles.tagTextSelected}>{title}</Text>
+            </TouchableOpacity>
+          </View>
+        );
+      } else {
+        if (id == tagId) {
+          return (
+            <View style={styles.itemSelected}>
+              <TouchableOpacity onPress={() => selectTag(id)}>
+                <Text style={styles.tagTextSelected}>{title}</Text>
+              </TouchableOpacity>
+            </View>
+          );
+        } else {
+          return null;
+        }
+      }
+    } else {
+      return (
+        <View style={styles.item}>
+          <TouchableOpacity onPress={() => selectTag(id)}>
+            <Text style={styles.tagText}>{title}</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+  };
   const renderItem = ({item}) => <Item title={item.tag} id={item.id} />;
 
   useEffect(() => {
     return tagRef.onSnapshot(querySnapshot => {
       const list2 = [];
+      const list3 = [];
+      let x = 0;
       querySnapshot.forEach(doc2 => {
+        x++;
         const {tag} = doc2.data();
         list2.push({
           id: doc2.id,
           tag,
         });
+        list3.push({
+          id: x,
+          tag,
+        });
       });
       setTagList(list2);
+      setTagListNote(list3);
+
       if (loading2) {
         setLoading2(false);
       }
     });
   }, []);
 
-  const Explorer = whatever => {
-    console.log(whatever);
+  const selectTag = id => {
+    console.log(id);
+    setTagid(id);
+    setTagClicked(true);
+  };
+
+  const tagSel = id => {
+    console.log(id);
+    setTagClicked(true);
+    setTagid(id);
+  };
+
+  const tagSel2 = (id, title) => {
+    console.log(id);
+    setTagClicked2(true);
+    setTagid2(id);
+    setNoteTag(title);
+  };
+  const tagSel2Reverse = id => {
+    console.log(id);
+    setTagClicked2(false);
+    setTagid2('');
   };
 
   useEffect(() => {
@@ -159,7 +220,7 @@ export default function Notes({navigation}) {
   };
 
   const Test = () => {
-    consoleLog('Tag Pressed');
+    console.log(tagListNote);
   };
 
   return (
@@ -167,18 +228,36 @@ export default function Notes({navigation}) {
       source={require('../../assets/back.png')}
       style={styles.body}>
       <View style={styles.body}>
-        <View style={styles.tagListWrapper}>
+        <View
+          style={
+            tagClicked ? styles.tagListWrapperClicked : styles.tagListWrapper
+          }>
           <FlatList
             style={styles.flatList}
             data={tagList}
             horizontal={true}
             keyExtractor={item => item.id}
-            renderItem={renderItem}
+            inverted={tagClicked}
+            renderItem={({item}) => (
+              <TagSelector
+                title={item.tag}
+                id={item.id}
+                tagClicked={tagClicked}
+                selectedId={tagId}
+                tagSelected={() => tagSel(item.id)}
+              />
+            )}
           />
           <TouchableOpacity
-            onPress={() => setTagModal(true)}
+            onPress={
+              tagClicked ? () => setTagClicked(false) : () => setTagModal(true)
+            }
             style={styles.tagAddBtn}>
-            <FontAwesome5 name={'plus'} size={15} color={'#FECA8C'} />
+            <FontAwesome5
+              name={tagClicked ? 'times' : 'plus'}
+              size={15}
+              color={'#FECA8C'}
+            />
           </TouchableOpacity>
 
           <Modal
@@ -211,6 +290,7 @@ export default function Notes({navigation}) {
             </View>
           </Modal>
         </View>
+
         <Modal
           visible={visible}
           animationType={'fade'}
@@ -230,17 +310,22 @@ export default function Notes({navigation}) {
                 onChangeText={setNoteDesription}></TextInput>
 
               <View style={styles.modalWrapperTimeButtons}>
-                <TextInput
-                  style={styles.tagInput}
-                  onChangeText={setNoteTag}
-                  editable={tagInput}
-                  placeholder={'ex. Ideas'}></TextInput>
-
-                <TouchableOpacity
-                  onPress={toggleTag}
-                  style={[tagInput ? styles.btnClicked : styles.btnUnclicked]}>
-                  <Text style={styles.modalTextTimeButtons}>Add</Text>
-                </TouchableOpacity>
+                <FlatList
+                  style={styles.flatList}
+                  data={tagListNote}
+                  horizontal={true}
+                  keyExtractor={item => item.id}
+                  renderItem={({item}) => (
+                    <TagSelector
+                      title={item.tag}
+                      id={item.id}
+                      tagClicked={tagClicked2}
+                      selectedId={tagId2}
+                      tagSelectedOnPress={() => tagSel2Reverse(item.id)}
+                      tagSelected={() => tagSel2(item.id, item.tag)}
+                    />
+                  )}
+                />
               </View>
 
               <View style={styles.modalWrapperCreateCancel}>
@@ -248,6 +333,12 @@ export default function Notes({navigation}) {
                   style={styles.modalBtnCreateCancel}
                   onPress={clear}>
                   <Text style={styles.modalBtnTextCreateCancel}>Close</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.modalBtnCreateCancel}
+                  onPress={Test}>
+                  <Text style={styles.modalBtnTextCreateCancel}>Test</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -289,6 +380,17 @@ const styles = StyleSheet.create({
     top: 5,
     flexDirection: 'row',
     position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tagListWrapperClicked: {
+    width: '98.1%',
+    borderRadius: 5,
+    top: 5,
+    flexDirection: 'row',
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   tagAddBtn: {
     width: 40,
@@ -414,5 +516,17 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     marginHorizontal: 6,
     borderRadius: 5,
+    justifyContent: 'center',
+  },
+  itemSelected: {
+    backgroundColor: '#FECA8C',
+    padding: 5,
+    marginRight: 10,
+    marginVertical: 8,
+    borderRadius: 5,
+    justifyContent: 'center',
+  },
+  tagTextSelected: {
+    color: 'black',
   },
 });
