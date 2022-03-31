@@ -12,7 +12,7 @@ import {
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import firestore from '@react-native-firebase/firestore';
 import TagSelector from '../Elements/TagSelector';
-
+import NoteDisplay from '../Elements/NoteDisplay';
 import {white} from 'react-native-paper/lib/typescript/styles/colors';
 
 export default function Notes({navigation}) {
@@ -26,24 +26,28 @@ export default function Notes({navigation}) {
   const [visible, setVisible] = useState(false);
   const [tagList, setTagList] = useState(['tag1', 'tag2', 'tag3']);
   const [tagListNote, setTagListNote] = useState(['tag1', 'tag2', 'tag3']);
-
   const [tagModal, setTagModal] = useState(false);
   const [tagId, setTagid] = useState('');
   const [tagIdNote, setTagIdNote] = useState('');
-
+  const [tagFilter, setTagFiler] = useState('');
   const [TagTitle, setTagTitle] = useState('');
   const noteRef = firestore().collection('notesDatabase');
   const tagRef = firestore().collection('tagsDatabase');
   const [tagClicked, setTagClicked] = useState(false);
   const [tagClicked2, setTagClicked2] = useState(false);
   const [tagId2, setTagid2] = useState('');
-
+  const [Add, setAdd] = useState(true);
+  const [itemEdit, setItemEdit] = useState('');
+  const [colums, setColums] = useState(2);
   const clear = () => {
     console.log('Clearing Iniciated...');
     setVisible(false);
     setNoteTitle('');
     setNoteDesription('');
     setNoteTag('');
+    setTagClicked2(false);
+    setTagid2('');
+    setItemEdit('');
   };
 
   //this is executed the items amount
@@ -113,13 +117,16 @@ export default function Notes({navigation}) {
   const selectTag = id => {
     console.log(id);
     setTagid(id);
+    setColums(1);
     setTagClicked(true);
   };
 
-  const tagSel = id => {
+  const tagSel = (id, title) => {
     console.log(id);
     setTagClicked(true);
+    setColums(1);
     setTagid(id);
+    setTagFiler(title);
   };
 
   const tagSel2 = (id, title) => {
@@ -136,17 +143,17 @@ export default function Notes({navigation}) {
 
   useEffect(() => {
     return noteRef.onSnapshot(querySnapshot => {
-      const list = [];
-      querySnapshot.forEach(doc => {
-        const {title, complete} = doc.data();
-        list.push({
-          id: doc.id,
-          noteTitle,
-          noteDescription,
-          noteTag,
+      const notesList = [];
+      querySnapshot.forEach(doc3 => {
+        const {title, description, tag} = doc3.data();
+        notesList.push({
+          id: doc3.id,
+          title,
+          description,
+          tag,
         });
       });
-      setNotes(list);
+      setNotes(notesList);
       if (loading) {
         setLoading(false);
       }
@@ -181,9 +188,40 @@ export default function Notes({navigation}) {
       title: noteTitle,
       description: noteDescription,
       tag: noteTag,
+      tagId2: tagId2,
       dateCreated: new Date(),
     });
 
+    clear();
+  }
+
+  async function loadNote(id) {
+    console.log('in Load Info');
+    const noteRef = firestore().collection('notesDatabase').doc(id);
+    const doc = await noteRef.get();
+    if (!doc.exists) {
+      console.log('No such document!');
+    } else {
+      console.log('Document data:', doc.data());
+      setNoteTitle(doc.data().title);
+      setNoteDesription(doc.data().description);
+      setNoteTag(doc.data().tag);
+      setVisible(true);
+      setTagClicked2(true);
+      setTagid2(doc.data().tagId2);
+      setAdd(false);
+      setItemEdit(id);
+    }
+  }
+
+  function UpdateInfo(id) {
+    console.log('in UPDATE Info');
+    firestore().collection('notesDatabase').doc(id).update({
+      title: noteTitle,
+      description: noteDescription,
+      tag: noteTag,
+      tagId2: tagId2,
+    });
     clear();
   }
 
@@ -210,6 +248,12 @@ export default function Notes({navigation}) {
     setVisible(true);
   };
 
+  const onPress2 = () => {
+    setTagClicked(false);
+    setColums(2);
+    console.log(colums);
+  };
+
   const toggleTag = () => {
     if (tagInput == false) {
       setTagInput(true);
@@ -220,7 +264,7 @@ export default function Notes({navigation}) {
   };
 
   const Test = () => {
-    console.log(tagListNote);
+    console.log(notes);
   };
 
   return (
@@ -244,14 +288,12 @@ export default function Notes({navigation}) {
                 id={item.id}
                 tagClicked={tagClicked}
                 selectedId={tagId}
-                tagSelected={() => tagSel(item.id)}
+                tagSelected={() => tagSel(item.id, item.tag)}
               />
             )}
           />
           <TouchableOpacity
-            onPress={
-              tagClicked ? () => setTagClicked(false) : () => setTagModal(true)
-            }
+            onPress={tagClicked ? () => onPress2() : () => setTagModal(true)}
             style={styles.tagAddBtn}>
             <FontAwesome5
               name={tagClicked ? 'times' : 'plus'}
@@ -259,6 +301,7 @@ export default function Notes({navigation}) {
               color={'#FECA8C'}
             />
           </TouchableOpacity>
+          {/* ****************** Modal Add Tag  **************** */}
 
           <Modal
             visible={tagModal}
@@ -291,6 +334,31 @@ export default function Notes({navigation}) {
           </Modal>
         </View>
 
+        {/* ****************** Note Wrapper **************** */}
+        <View style={styles.notesWrapper}>
+          <FlatList
+            data={notes}
+            keyExtractor={item => item.id}
+            key={colums}
+            numColumns={colums}
+            renderItem={({item}) => (
+              <NoteDisplay
+                title={item.title}
+                tagClicked={tagClicked}
+                tagSlc={tagFilter}
+                loadInfo={() => loadNote(item.id)}
+                id={item.id}
+                tag={item.tag}
+                description={item.description}
+                elFunction={() => Test()}
+                elIcon={'check'}
+              />
+            )}
+          />
+        </View>
+
+        {/* ****************** Modal Add Note  **************** */}
+
         <Modal
           visible={visible}
           animationType={'fade'}
@@ -301,6 +369,7 @@ export default function Notes({navigation}) {
               <TextInput
                 style={styles.modalTitle}
                 placeholder="Note title"
+                maxLength={20}
                 value={noteTitle}
                 onChangeText={setNoteTitle}></TextInput>
               <TextInput
@@ -344,7 +413,7 @@ export default function Notes({navigation}) {
                 <TouchableOpacity
                   disabled={noteTitle.length === 0}
                   style={styles.modalBtnCreateCancel}
-                  onPress={addNote}>
+                  onPress={Add ? addNote : () => UpdateInfo(itemEdit)}>
                   <Text style={styles.modalBtnTextCreateCancel}>Confirm</Text>
                 </TouchableOpacity>
               </View>
@@ -355,8 +424,6 @@ export default function Notes({navigation}) {
         <TouchableOpacity style={styles.addBtn} onPress={onPressHandler}>
           <FontAwesome5 name={'plus'} size={30} color={'#FECA8C'} />
         </TouchableOpacity>
-
-        <Text style={styles.text}>Notes</Text>
       </View>
     </ImageBackground>
   );
@@ -402,10 +469,6 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
 
-  flatList: {
-    marginRight: 7,
-    marginLeft: 7,
-  },
   addBtn: {
     width: 60,
     height: 60,
@@ -528,5 +591,9 @@ const styles = StyleSheet.create({
   },
   tagTextSelected: {
     color: 'black',
+  },
+  notesWrapper: {
+    flex: 1,
+    marginTop: 50,
   },
 });

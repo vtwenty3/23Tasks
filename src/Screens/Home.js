@@ -13,6 +13,7 @@ import {
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import firestore from '@react-native-firebase/firestore';
 import Todo2 from '../Elements/Todo2';
+import GlobalStyle from '../GlobalStyle';
 
 export default function Home({navigation}) {
   const [AddMenu, SetAddMenu] = useState(false); //modal event handler
@@ -182,12 +183,13 @@ export default function Home({navigation}) {
           <View style={styles.modal}>
             <View style={styles.modalWrapper}>
               <TextInput
-                style={styles.modalTitle}
+                style={[GlobalStyle.Title]}
                 placeholder="Task title"
                 value={todo}
                 onChangeText={setTodo}></TextInput>
               <TextInput
-                style={styles.modalDescription}
+                style={[GlobalStyle.Description]}
+                multiline
                 placeholder="Description"
                 value={description}
                 onChangeText={setDescription}></TextInput>
@@ -274,25 +276,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#3b3c3d',
     borderRadius: 7,
     margin: 10,
-  },
-  modalTitle: {
-    borderColor: 'grey',
-    borderWidth: 1,
-    borderRadius: 7,
-    margin: 10,
-    fontSize: 20,
-    backgroundColor: 'grey',
-    elevation: 5,
-  },
-  modalDescription: {
-    height: 150,
-    borderColor: 'grey',
-    borderWidth: 1,
-    borderRadius: 7,
-    margin: 10,
-    fontSize: 12,
-    backgroundColor: 'grey',
-    elevation: 5,
   },
 
   modalBtnCreateCancel: {
