@@ -276,22 +276,23 @@ export default function Notes({navigation}) {
           style={
             tagClicked ? styles.tagListWrapperClicked : styles.tagListWrapper
           }>
-          <FlatList
-            style={styles.flatList}
-            data={tagList}
-            horizontal={true}
-            keyExtractor={item => item.id}
-            inverted={tagClicked}
-            renderItem={({item}) => (
-              <TagSelector
-                title={item.tag}
-                id={item.id}
-                tagClicked={tagClicked}
-                selectedId={tagId}
-                tagSelected={() => tagSel(item.id, item.tag)}
-              />
-            )}
-          />
+          <View style={styles.flatList}>
+            <FlatList
+              data={tagList}
+              horizontal={true}
+              keyExtractor={item => item.id}
+              inverted={tagClicked}
+              renderItem={({item}) => (
+                <TagSelector
+                  title={item.tag}
+                  id={item.id}
+                  tagClicked={tagClicked}
+                  selectedId={tagId}
+                  tagSelected={() => tagSel(item.id, item.tag)}
+                />
+              )}
+            />
+          </View>
           <TouchableOpacity
             onPress={tagClicked ? () => onPress2() : () => setTagModal(true)}
             style={styles.tagAddBtn}>
@@ -380,7 +381,6 @@ export default function Notes({navigation}) {
 
               <View style={styles.modalWrapperTimeButtons}>
                 <FlatList
-                  style={styles.flatList}
                   data={tagListNote}
                   horizontal={true}
                   keyExtractor={item => item.id}
@@ -441,6 +441,30 @@ const styles = StyleSheet.create({
     margin: 10,
   },
 
+  flatList: {
+    position: 'absolute',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    borderRadius: 30,
+    width: 360,
+    height: 50,
+    paddingHorizontal: 10,
+    top: 2,
+    left: 15,
+  },
+
+  tagAddBtn: {
+    position: 'absolute',
+    top: 7,
+    right: 15,
+    width: 40,
+    height: 40,
+    borderRadius: 30,
+    backgroundColor: '#636363',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+  },
+
   tagListWrapper: {
     width: '98%',
     borderRadius: 5,
@@ -458,15 +482,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  tagAddBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 30,
-    backgroundColor: '#636363',
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 5,
   },
 
   addBtn: {
@@ -594,6 +609,6 @@ const styles = StyleSheet.create({
   },
   notesWrapper: {
     flex: 1,
-    marginTop: 50,
+    marginTop: 60,
   },
 });

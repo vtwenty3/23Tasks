@@ -18,7 +18,6 @@ import Home from './src/Screens/Home';
 import Notes from './src/Screens/Notes';
 import Upcoming from './src/Screens/Upcoming';
 import Add from './src/Screens/Add';
-import {createStackNavigator} from 'react-navigation-stack';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {DefaultTheme, DarkTheme} from '@react-navigation/native';
 
@@ -45,7 +44,7 @@ function App() {
               size = focused ? 25 : 20;
               // color = focused ? '#f0f' : '#555';
             } else if (route.name === 'Home') {
-              iconName = focused ? 'lightbulb' : 'home';
+              iconName = 'home';
               size = focused ? 27 : 20;
             } else if (route.name === 'Upcoming') {
               iconName = 'calendar-day';
@@ -56,10 +55,8 @@ function App() {
             }
             return <FontAwesome5 name={iconName} size={size} color={color} />;
           },
-        })}
-        activeColor="#f0edf6"
-        inactiveColor="#3e2465"
-        barStyle={{backgroundColor: '#694fad'}}>
+          headerShown: false,
+        })}>
         <Tab.Screen name="Settings" component={Settings} />
         <Tab.Screen name="Notes" component={Notes} />
         <Tab.Screen name="Home" component={Home} />

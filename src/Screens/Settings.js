@@ -32,6 +32,24 @@ export default function Settings({navigation}) {
         console.error(error);
       });
   };
+  const login = () => {
+    auth()
+      .signInWithEmailAndPassword(username, password)
+      .then(() => {
+        console.log('User account created & signed in!');
+      })
+      .catch(error => {
+        if (error.code === 'auth/email-already-in-use') {
+          console.log('That email address is already in use!');
+        }
+
+        if (error.code === 'auth/invalid-email') {
+          console.log('That email address is invalid!');
+        }
+
+        console.error(error);
+      });
+  };
 
   const logout = () => {
     auth()
@@ -84,7 +102,7 @@ export default function Settings({navigation}) {
           <TouchableOpacity
             // disabled={username.length === 0 || password.length === 0}
             style={styles.btnLogin}
-            onPress={register}>
+            onPress={login}>
             <Text style={styles.txtbtnLogin}>Login</Text>
           </TouchableOpacity>
         </View>

@@ -111,12 +111,6 @@ export default function Upcoming({navigation}) {
         </View>
 
         {/* bulb button */}
-        <TouchableOpacity style={styles.addBtn} onPress={deleteAll}>
-          <FontAwesome5 name={'trash'} size={30} color={'#FECA8C'} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.addBtn2} onPress={showMe}>
-          <FontAwesome5 name={'trash'} size={30} color={'#FECA8C'} />
-        </TouchableOpacity>
       </View>
     </ImageBackground>
   );

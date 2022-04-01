@@ -236,7 +236,7 @@ export default function Home({navigation}) {
 
         {/* bulb button */}
         <TouchableOpacity style={styles.addBtn} onPress={onPressHandler}>
-          <FontAwesome5 name={'lightbulb'} size={30} color={'#FECA8C'} />
+          <FontAwesome5 name={'plus'} size={30} color={'#FECA8C'} />
         </TouchableOpacity>
       </View>
     </ImageBackground>

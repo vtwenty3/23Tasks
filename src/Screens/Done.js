@@ -26,13 +26,12 @@ export default function Done({navigation}) {
   // };
 
   const [todo, setTodo] = useState('');
-
-  const ref = firestore().collection('tasksDatabase');
   const toDelete = firestore()
     .collection('tasksDatabase')
     .where('complete', '==', true);
   const [loading, setLoading] = useState(true);
   const [todos, setTodos] = useState([]);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     return toDelete.onSnapshot(querySnapshot => {
@@ -52,8 +51,10 @@ export default function Done({navigation}) {
     });
   }, []);
 
-  const onPressHandler = () => {
-    navigation.navigate('Settings');
+  // console.log(cont);
+
+  const deleteModal = () => {
+    setVisible(true);
   };
 
   async function toggleComplete(id, complete) {
@@ -62,73 +63,95 @@ export default function Done({navigation}) {
     });
   }
 
-  const deleteAll = () => {
-    cont = true;
-    toDelete.onSnapshot(querySnapshot => {
-      querySnapshot.forEach(doc => {
-        if (cont) {
-          doc.ref.delete();
-        }
-        if (querySnapshot.size == 1) {
-          cont = false;
-          return console.log('Deletion Terminated');
-        }
+  const deleteAll1 = () => {
+    firestore()
+      .collection('tasksDatabase')
+      .where('complete', '==', true)
+      .get()
+      .then(res => {
+        res.forEach(element => {
+          element.ref.delete();
+        });
       });
-    });
+    setVisible(false);
   };
+
   return (
     <ImageBackground
       source={require('../../assets/back.png')}
       style={styles.body}>
-      <View style={styles.body}>
-        {/* ToDo Elements in a flat list, actual element in todo.js  */}
-        <View style={styles.listaBe}>
-          <FlatList
-            style={styles.flatList}
-            data={todos}
-            keyExtractor={item => item.id}
-            renderItem={({item}) => (
-              <Todo2
-                title={item.title}
-                id={item.id}
-                elFunction={() => toggleComplete(item.id, item.complete)}
-                elIcon={'redo'}
-              />
-            )}
-          />
-        </View>
+      <Modal
+        visible={visible}
+        animationType={'fade'}
+        onRequestClose={() => setVisible(false)}
+        transparent>
+        <View style={styles.modal}>
+          <Text style={styles.modalText}>
+            Are you sure you want to delete all Completed tasks?
+          </Text>
 
-        {/* Add to do modal */}
-
-        <View style={styles.addMenuParent}>
-          <View style={styles.addMenu}>
-            <TextInput
-              style={styles.addMenuTitle}
-              placeholder="Task title"
-              value={todo}
-              onChangeText={setTodo}></TextInput>
-            <TextInput
-              style={styles.addMenuDescription}
-              placeholder="Description"></TextInput>
+          <View style={styles.modalWrapperTimeButtons}>
             <TouchableOpacity
-              disabled={todo.length === 0}
-              style={styles.btnText}>
-              <Text> Create Task </Text>
+              style={styles.modalBtnCreateCancel}
+              onPress={() => setVisible(false)}>
+              <Text style={styles.modalBtnTextCreateCancel}>Close</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.modalBtnCreateCancel}
+              onPress={() => deleteAll1()}>
+              <Text style={styles.modalBtnTextCreateCancel}>Confirm</Text>
             </TouchableOpacity>
           </View>
         </View>
+      </Modal>
 
-        {/* <Text style={[GlobalStyle.CustomFont, styles.text]}>Home</Text> */}
+      {/* ToDo Elements in a flat list, actual element in todo.js  */}
 
-        {/* bulb button */}
-        <TouchableOpacity style={styles.addBtn} onPress={deleteAll}>
-          <FontAwesome5 name={'trash'} size={30} color={'#FECA8C'} />
-        </TouchableOpacity>
-        {/* 
+      <View style={styles.listaBe}>
+        <FlatList
+          style={styles.flatList}
+          data={todos}
+          keyExtractor={item => item.id}
+          renderItem={({item}) => (
+            <Todo2
+              title={item.title}
+              id={item.id}
+              elFunction={() => toggleComplete(item.id, item.complete)}
+              elIcon={'redo'}
+            />
+          )}
+        />
+      </View>
+
+      {/* Add to do modal */}
+
+      <View style={styles.addMenuParent}>
+        <View style={styles.addMenu}>
+          <TextInput
+            style={styles.addMenuTitle}
+            placeholder="Task title"
+            value={todo}
+            onChangeText={setTodo}></TextInput>
+          <TextInput
+            style={styles.addMenuDescription}
+            placeholder="Description"></TextInput>
+          <TouchableOpacity disabled={todo.length === 0} style={styles.btnText}>
+            <Text> Create Task </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* <Text style={[GlobalStyle.CustomFont, styles.text]}>Home</Text> */}
+
+      {/* bulb button */}
+      <TouchableOpacity style={styles.addBtn} onPress={() => deleteModal()}>
+        <FontAwesome5 name={'trash'} size={30} color={'#FECA8C'} />
+      </TouchableOpacity>
+      {/* 
         <TouchableOpacity style={styles.dateBtn} onPress={date}>
           <FontAwesome5 name={'calendar'} size={30} color={'#FECA8C'} />
         </TouchableOpacity> */}
-      </View>
     </ImageBackground>
   );
 }
@@ -137,6 +160,7 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   text: {
     fontFamily: 'Poppins-Thin',
@@ -209,5 +233,31 @@ const styles = StyleSheet.create({
     marginRight: '33%',
     borderRadius: 3,
     height: 30,
+  },
+  modal: {
+    marginTop: 200,
+    width: '90%',
+    backgroundColor: '#3b3c3d',
+    borderRadius: 7,
+    margin: 10,
+  },
+  modalText: {
+    color: 'white',
+  },
+
+  modalBtnCreateCancel: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'grey',
+    borderRadius: 3,
+    height: 30,
+    paddingLeft: 30,
+    paddingRight: 30,
+    margin: 10,
+  },
+  modalWrapperTimeButtons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
