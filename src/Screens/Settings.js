@@ -80,31 +80,56 @@ export default function Settings({navigation}) {
       <ImageBackground
         style={styles.body}
         source={require('../../assets/back.png')}>
-        <TextInput
-          style={styles.txtInput}
-          placeholder="name@email.com"
-          value={username}
-          onChangeText={setUsername}></TextInput>
-        <TextInput
-          style={styles.txtInput}
-          multiline
-          placeholder="superSecurePassword"
-          autoCapitalize={'none'}
-          onChangeText={setPassword}></TextInput>
+        <View
+          style={{
+            padding: 10,
+            backgroundColor: '#313131',
+            borderRadius: 7,
+            shadowColor: '#000',
+            shadowOffset: {
+              width: 0,
+              height: 6,
+            },
+            shadowOpacity: 0.37,
+            shadowRadius: 7.49,
 
-        <View style={styles.btnWrapper}>
-          <TouchableOpacity
-            // disabled={username.length === 0 || password.length === 0}
-            style={styles.btnRegister}
-            onPress={register}>
-            <Text style={styles.txtbtnRegister}>Register</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            // disabled={username.length === 0 || password.length === 0}
-            style={styles.btnLogin}
-            onPress={login}>
-            <Text style={styles.txtbtnLogin}>Login</Text>
-          </TouchableOpacity>
+            elevation: 12,
+          }}>
+          <Text
+            style={{
+              fontFamily: 'Poppins-Bold',
+              textAlign: 'center',
+              color: '#edc664',
+              fontSize: 40,
+            }}>
+            Log In
+          </Text>
+          <TextInput
+            style={styles.txtInput}
+            placeholder="name@email.com"
+            value={username}
+            onChangeText={setUsername}></TextInput>
+          <TextInput
+            style={styles.txtInput}
+            multiline
+            placeholder="Password"
+            autoCapitalize={'none'}
+            onChangeText={setPassword}></TextInput>
+
+          <View style={styles.btnWrapper}>
+            <TouchableOpacity
+              disabled={username.length === 0 || password.length === 0}
+              style={styles.btnRegister}
+              onPress={register}>
+              <Text style={styles.txtbtnRegister}>Register</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              disabled={username.length === 0 || password.length === 0}
+              style={styles.btnLogin}
+              onPress={login}>
+              <Text style={styles.txtbtnLogin}>Login</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ImageBackground>
     );
@@ -175,6 +200,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: 'grey',
     elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.37,
+    shadowRadius: 7.49,
+
+    elevation: 12,
   },
   welcome: {
     fontSize: 20,

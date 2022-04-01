@@ -27,13 +27,14 @@ export default function Home({navigation}) {
   const [itemEdit, setItemEdit] = useState(''); //storing the id of the doc, global access
   const [loading, setLoading] = useState(true);
   const [todos, setTodos] = useState([]);
-
+  const [empty, setEmpty] = useState();
   //creating instances of the database, showin only tasks with (complete, tommorow) = false
   const ref = firestore().collection('tasksDatabase');
   const toComplete = firestore()
     .collection('tasksDatabase')
     .where('complete', '==', false)
-    .where('tommorrow', '==', false);
+    .where('tommorrow', '==', false)
+    .where('someday', '==', false);
   //todos list handler
 
   const taskToday = () => {
@@ -68,6 +69,12 @@ export default function Home({navigation}) {
       setTodos(list);
       if (loading) {
         setLoading(false);
+      }
+      if (list.length == 0) {
+        console.log('emptyyyy');
+        setEmpty(true);
+      } else {
+        setEmpty(false);
       }
     });
   }, []);
@@ -156,6 +163,28 @@ export default function Home({navigation}) {
       source={require('../../assets/back.png')}
       style={styles.body}>
       <View style={styles.body}>
+        {empty ? (
+          <View
+            style={{
+              backgroundColor: 'rgba(238, 199, 118, 0.47)',
+              borderRadius: 20,
+              padding: 10,
+              marginTop: 20,
+            }}>
+            <Text
+              style={{
+                fontFamily: 'Poppins-Bold',
+                color: 'black',
+                fontSize: 23,
+                textAlign: 'center',
+              }}>
+              It looks like you {'\n'} dont have much to do.
+            </Text>
+          </View>
+        ) : (
+          <View></View>
+        )}
+
         {/* ToDo Elements in a flat list, actual element in todo.js  */}
         <View style={styles.listaBe}>
           <FlatList
@@ -181,51 +210,77 @@ export default function Home({navigation}) {
           onRequestClose={clear}
           transparent>
           <View style={styles.modal}>
-            <View style={styles.modalWrapper}>
+            <View style={GlobalStyle.ModalWrapper}>
               <TextInput
                 style={[GlobalStyle.Title]}
-                placeholder="Task title"
+                placeholder="Taks Title"
+                placeholderTextColor="#DEDEDE"
                 value={todo}
                 onChangeText={setTodo}></TextInput>
               <TextInput
                 style={[GlobalStyle.Description]}
                 multiline
-                placeholder="Description"
+                placeholder="Task Description"
+                placeholderTextColor="#DEDEDE"
                 value={description}
                 onChangeText={setDescription}></TextInput>
 
               <View style={styles.modalWrapperTimeButtons}>
                 <TouchableOpacity
-                  style={[today ? styles.btnClicked : styles.btnUnclicked]}
+                  style={[
+                    today ? GlobalStyle.btnClicked : GlobalStyle.btnUnclicked,
+                  ]}
                   onPress={taskToday}>
-                  <Text style={styles.modalTextTimeButtons}>Today</Text>
+                  <Text style={[GlobalStyle.btnText]}>Today</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={[tommorrow ? styles.btnClicked : styles.btnUnclicked]}
+                  style={[
+                    tommorrow
+                      ? GlobalStyle.btnClicked
+                      : GlobalStyle.btnUnclicked,
+                  ]}
                   onPress={taskTommorrow}>
-                  <Text>Tommorrow</Text>
+                  <Text style={[GlobalStyle.btnText]}>Tommorrow</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={[someday ? styles.btnClicked : styles.btnUnclicked]}
+                  style={[
+                    someday ? GlobalStyle.btnClicked : GlobalStyle.btnUnclicked,
+                  ]}
                   onPress={taskSomeday}>
-                  <Text>Someday</Text>
+                  <Text style={[GlobalStyle.btnText]}>Someday</Text>
                 </TouchableOpacity>
               </View>
 
               <View style={styles.modalWrapperCreateCancel}>
                 <TouchableOpacity
-                  style={styles.modalBtnCreateCancel}
+                  style={[GlobalStyle.btnUnclicked]}
                   onPress={clear}>
-                  <Text style={styles.modalBtnTextCreateCancel}>Close</Text>
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <FontAwesome5
+                      style={{right: 8}}
+                      name={'times'}
+                      size={18}
+                      color={'#EF7373'}
+                    />
+                    <Text style={[GlobalStyle.btnCloseConfirmText]}>Close</Text>
+                  </View>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   disabled={todo.length === 0}
-                  style={styles.modalBtnCreateCancel}
+                  style={[GlobalStyle.btnUnclicked]}
                   onPress={add ? addTodo : () => UpdateInfo(itemEdit)}>
-                  <Text style={styles.modalBtnTextCreateCancel}>Confirm</Text>
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <FontAwesome5
+                      style={{right: 5}}
+                      name={'check'}
+                      size={18}
+                      color={'#FECA8C'}
+                    />
+                    <Text style={GlobalStyle.btnCloseConfirmText}>Confirm</Text>
+                  </View>
                 </TouchableOpacity>
               </View>
             </View>
@@ -255,6 +310,7 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   addBtn: {
+    zIndex: 100,
     width: 60,
     height: 60,
     borderRadius: 30,
@@ -290,13 +346,16 @@ const styles = StyleSheet.create({
   },
 
   modalBtnTextCreateCancel: {
-    fontFamily: 'Poppins-SemiBold',
+    fontFamily: 'Poppins-Medium',
+    color: 'white',
   },
 
   modalWrapperCreateCancel: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 3,
+    marginTop: -3,
   },
 
   modalWrapperTimeButtons: {

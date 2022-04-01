@@ -13,13 +13,13 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import firestore from '@react-native-firebase/firestore';
 import TagSelector from '../Elements/TagSelector';
 import NoteDisplay from '../Elements/NoteDisplay';
-import {white} from 'react-native-paper/lib/typescript/styles/colors';
+import GlobalStyle from '../GlobalStyle';
+import {black} from 'react-native-paper/lib/typescript/styles/colors';
 
 export default function Notes({navigation}) {
   const [noteTitle, setNoteTitle] = useState('');
   const [noteDescription, setNoteDesription] = useState('');
   const [noteTag, setNoteTag] = useState('no-tag');
-  const [tagInput, setTagInput] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loading2, setLoading2] = useState(true);
   const [notes, setNotes] = useState([]);
@@ -28,9 +28,7 @@ export default function Notes({navigation}) {
   const [tagListNote, setTagListNote] = useState(['tag1', 'tag2', 'tag3']);
   const [tagModal, setTagModal] = useState(false);
   const [tagId, setTagid] = useState('');
-  const [tagIdNote, setTagIdNote] = useState('');
   const [tagFilter, setTagFiler] = useState('');
-  const [TagTitle, setTagTitle] = useState('');
   const noteRef = firestore().collection('notesDatabase');
   const tagRef = firestore().collection('tagsDatabase');
   const [tagClicked, setTagClicked] = useState(false);
@@ -50,44 +48,8 @@ export default function Notes({navigation}) {
     setItemEdit('');
   };
 
-  //this is executed the items amount
-  // when tag is clicked, return null, only render the selected one
-  const Item = ({title, id}) => {
-    if (tagClicked == true) {
-      if (visible) {
-        //const [tagIdNote, setTagIdNote] = useState('');
-        return (
-          <View style={styles.itemSelected}>
-            <TouchableOpacity onPress={() => selectTag(id)}>
-              <Text style={styles.tagTextSelected}>{title}</Text>
-            </TouchableOpacity>
-          </View>
-        );
-      } else {
-        if (id == tagId) {
-          return (
-            <View style={styles.itemSelected}>
-              <TouchableOpacity onPress={() => selectTag(id)}>
-                <Text style={styles.tagTextSelected}>{title}</Text>
-              </TouchableOpacity>
-            </View>
-          );
-        } else {
-          return null;
-        }
-      }
-    } else {
-      return (
-        <View style={styles.item}>
-          <TouchableOpacity onPress={() => selectTag(id)}>
-            <Text style={styles.tagText}>{title}</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    }
-  };
-  const renderItem = ({item}) => <Item title={item.tag} id={item.id} />;
-
+  //load the tags in two lists with two different ids
+  //two ids to differenciate the two FlatLists, should be updated, possible bugs
   useEffect(() => {
     return tagRef.onSnapshot(querySnapshot => {
       const list2 = [];
@@ -114,33 +76,7 @@ export default function Notes({navigation}) {
     });
   }, []);
 
-  const selectTag = id => {
-    console.log(id);
-    setTagid(id);
-    setColums(1);
-    setTagClicked(true);
-  };
-
-  const tagSel = (id, title) => {
-    console.log(id);
-    setTagClicked(true);
-    setColums(1);
-    setTagid(id);
-    setTagFiler(title);
-  };
-
-  const tagSel2 = (id, title) => {
-    console.log(id);
-    setTagClicked2(true);
-    setTagid2(id);
-    setNoteTag(title);
-  };
-  const tagSel2Reverse = id => {
-    console.log(id);
-    setTagClicked2(false);
-    setTagid2('');
-  };
-
+  //load the notes in notesList
   useEffect(() => {
     return noteRef.onSnapshot(querySnapshot => {
       const notesList = [];
@@ -160,6 +96,28 @@ export default function Notes({navigation}) {
     });
   }, []);
 
+  //can be reduced to 1 function with conditions
+  const topTagSelect = (id, title) => {
+    console.log(id);
+    setTagClicked(true);
+    setColums(1);
+    setTagid(id);
+    setTagFiler(title);
+  };
+
+  const modalTagSelect = (id, title) => {
+    console.log(id);
+    setTagClicked2(true);
+    setTagid2(id);
+    setNoteTag(title);
+  };
+
+  const modalTagSelectClear = () => {
+    setTagClicked2(false);
+    setTagid2('');
+  };
+
+  //Add Note to Firebase
   async function addNote() {
     //writing to firabase
     console.log(noteTitle, '1');
@@ -168,21 +126,6 @@ export default function Notes({navigation}) {
       alert('Please provide a title!');
       return;
     }
-
-    async function LoadInfo(id) {
-      console.log('in Load Info');
-      const tagsRef = firestore().collection('tagsDatabase').doc(id);
-      const doc = await tagsRef.get();
-      if (!doc.exists) {
-        console.log('No such document!');
-      } else {
-        console.log('Document data:', doc.data());
-        setTagTitle(doc.data().title);
-        setTagid(id);
-        console.log(tagId, TagTitle);
-      }
-    }
-
     await noteRef.add({
       //add the fileds
       title: noteTitle,
@@ -191,10 +134,10 @@ export default function Notes({navigation}) {
       tagId2: tagId2,
       dateCreated: new Date(),
     });
-
     clear();
   }
 
+  //Load Note onPress
   async function loadNote(id) {
     console.log('in Load Info');
     const noteRef = firestore().collection('notesDatabase').doc(id);
@@ -214,17 +157,7 @@ export default function Notes({navigation}) {
     }
   }
 
-  function UpdateInfo(id) {
-    console.log('in UPDATE Info');
-    firestore().collection('notesDatabase').doc(id).update({
-      title: noteTitle,
-      description: noteDescription,
-      tag: noteTag,
-      tagId2: tagId2,
-    });
-    clear();
-  }
-
+  //Add Top Tag to Firebase
   async function addTag() {
     //writing to firabase
     console.log(noteTag, '1');
@@ -240,43 +173,42 @@ export default function Notes({navigation}) {
     setNoteTag('');
   }
 
+  //Update Note onPress Confirm
+  function UpdateInfo(id) {
+    console.log('in UPDATE Info');
+    firestore().collection('notesDatabase').doc(id).update({
+      title: noteTitle,
+      description: noteDescription,
+      tag: noteTag,
+      tagId2: tagId2,
+    });
+    clear();
+  }
+
   if (loading) {
     return null;
   }
 
+  //Open Modal, can be arrow function
   const onPressHandler = () => {
     setVisible(true);
   };
 
-  const onPress2 = () => {
+  //used in TopTag
+  const cancelTagSelection = () => {
     setTagClicked(false);
     setColums(2);
     console.log(colums);
-  };
-
-  const toggleTag = () => {
-    if (tagInput == false) {
-      setTagInput(true);
-    }
-    if (tagInput == true) {
-      setTagInput(false);
-    }
-  };
-
-  const Test = () => {
-    console.log(notes);
   };
 
   return (
     <ImageBackground
       source={require('../../assets/back.png')}
       style={styles.body}>
-      <View style={styles.body}>
-        <View
-          style={
-            tagClicked ? styles.tagListWrapperClicked : styles.tagListWrapper
-          }>
-          <View style={styles.flatList}>
+      <View style={styles.tagListWrapper}>
+        <View>
+          {/* two styles to force rerender as the flatlist does not scroll back, bug in react? */}
+          <View style={!tagClicked ? styles.flatList : styles.flatListClicked}>
             <FlatList
               data={tagList}
               horizontal={true}
@@ -288,98 +220,114 @@ export default function Notes({navigation}) {
                   id={item.id}
                   tagClicked={tagClicked}
                   selectedId={tagId}
-                  tagSelected={() => tagSel(item.id, item.tag)}
+                  tagSelected={() => topTagSelect(item.id, item.tag)}
                 />
               )}
             />
           </View>
           <TouchableOpacity
-            onPress={tagClicked ? () => onPress2() : () => setTagModal(true)}
+            onPress={
+              tagClicked ? () => cancelTagSelection() : () => setTagModal(true)
+            }
             style={styles.tagAddBtn}>
             <FontAwesome5
               name={tagClicked ? 'times' : 'plus'}
-              size={15}
-              color={'#FECA8C'}
+              size={18}
+              color={tagClicked ? '#ff6d63' : '#FECA8C'}
             />
           </TouchableOpacity>
-          {/* ****************** Modal Add Tag  **************** */}
-
-          <Modal
-            visible={tagModal}
-            animationType={'fade'}
-            onRequestClose={clear}
-            transparent>
-            <View style={styles.modal}>
-              <View style={styles.modalWrapper}>
-                <View style={styles.modalWrapperTimeButtons}>
-                  <TextInput
-                    style={styles.tagInput}
-                    onChangeText={setNoteTag}
-                    placeholder={'ex. Ideas'}></TextInput>
-                  <TouchableOpacity
-                    onPress={addTag}
-                    style={[styles.btnUnclicked]}>
-                    <Text style={styles.modalTextTimeButtons}>Add</Text>
-                  </TouchableOpacity>
-                </View>
-
-                <View style={styles.modalWrapperCreateCancel}>
-                  <TouchableOpacity
-                    style={styles.modalBtnCreateCancel}
-                    onPress={() => setTagModal(false)}>
-                    <Text style={styles.modalBtnTextCreateCancel}>Close</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-          </Modal>
         </View>
 
-        {/* ****************** Note Wrapper **************** */}
-        <View style={styles.notesWrapper}>
-          <FlatList
-            data={notes}
-            keyExtractor={item => item.id}
-            key={colums}
-            numColumns={colums}
-            renderItem={({item}) => (
-              <NoteDisplay
-                title={item.title}
-                tagClicked={tagClicked}
-                tagSlc={tagFilter}
-                loadInfo={() => loadNote(item.id)}
-                id={item.id}
-                tag={item.tag}
-                description={item.description}
-                elFunction={() => Test()}
-                elIcon={'check'}
-              />
-            )}
-          />
-        </View>
-
-        {/* ****************** Modal Add Note  **************** */}
+        {/* ****************** Modal Add Tag  **************** */}
 
         <Modal
-          visible={visible}
+          visible={tagModal}
           animationType={'fade'}
           onRequestClose={clear}
           transparent>
           <View style={styles.modal}>
             <View style={styles.modalWrapper}>
-              <TextInput
-                style={styles.modalTitle}
-                placeholder="Note title"
-                maxLength={20}
-                value={noteTitle}
-                onChangeText={setNoteTitle}></TextInput>
-              <TextInput
-                style={styles.modalDescription}
-                placeholder="Note Description"
-                value={noteDescription}
-                onChangeText={setNoteDesription}></TextInput>
-
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text style={styles.modalWrapperTitle}>Add a tag</Text>
+                <FontAwesome5
+                  style={styles.tagIco}
+                  name={'tag'}
+                  size={18}
+                  color={'#FECA8C'}
+                />
+              </View>
               <View style={styles.modalWrapperTimeButtons}>
+                <TextInput
+                  style={styles.tagInput}
+                  onChangeText={setNoteTag}
+                  placeholder={'ex. Ideas'}></TextInput>
+                <TouchableOpacity
+                  onPress={addTag}
+                  style={[styles.btnUnclicked]}>
+                  <Text style={styles.modalTextTimeButtons}>Add</Text>
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.modalWrapperCreateCancel}>
+                <TouchableOpacity
+                  style={styles.modalBtnCreateCancel}
+                  onPress={() => setTagModal(false)}>
+                  <Text style={styles.modalBtnTextCreateCancel}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      </View>
+
+      {/* ****************** Note Wrapper **************** */}
+      <View style={styles.notesWrapper}>
+        <FlatList
+          data={notes}
+          keyExtractor={item => item.id}
+          key={colums}
+          numColumns={colums}
+          renderItem={({item}) => (
+            <NoteDisplay
+              title={item.title}
+              tagClicked={tagClicked}
+              tagSlc={tagFilter}
+              loadInfo={() => loadNote(item.id)}
+              id={item.id}
+              tag={item.tag}
+              description={item.description}
+              elIcon={'check'}
+            />
+          )}
+        />
+      </View>
+
+      {/* ****************** Modal Add Note  **************** */}
+
+      <Modal
+        visible={visible}
+        animationType={'fade'}
+        onRequestClose={clear}
+        transparent>
+        <View style={styles.modal}>
+          <View style={[GlobalStyle.ModalWrapper]}>
+            <TextInput
+              style={[GlobalStyle.Title]}
+              placeholder="Note title"
+              placeholderTextColor="#DEDEDE"
+              maxLength={20}
+              value={noteTitle}
+              onChangeText={setNoteTitle}></TextInput>
+            <TextInput
+              style={[GlobalStyle.Description]}
+              placeholder="Note Description"
+              placeholderTextColor="#DEDEDE"
+              value={noteDescription}
+              onChangeText={setNoteDesription}></TextInput>
+
+            <View
+              style={!tagClicked2 ? styles.flatList2 : styles.flatListClicked2}>
+              <View style={tagClicked2 ? {right: 40} : {}}>
                 <FlatList
                   data={tagListNote}
                   horizontal={true}
@@ -390,41 +338,64 @@ export default function Notes({navigation}) {
                       id={item.id}
                       tagClicked={tagClicked2}
                       selectedId={tagId2}
-                      tagSelectedOnPress={() => tagSel2Reverse(item.id)}
-                      tagSelected={() => tagSel2(item.id, item.tag)}
+                      tagSelectedOnPress={() => modalTagSelectClear(item.id)}
+                      tagSelected={() => modalTagSelect(item.id, item.tag)}
                     />
                   )}
                 />
               </View>
+              <TouchableOpacity
+                onPress={
+                  tagClicked2
+                    ? () => modalTagSelectClear()
+                    : () => setTagModal(true)
+                }
+                style={styles.tagAddBtn2}>
+                <FontAwesome5
+                  name={tagClicked2 ? 'times' : 'plus'}
+                  size={18}
+                  color={tagClicked2 ? '#ff6d63' : '#FECA8C'}
+                />
+              </TouchableOpacity>
+            </View>
 
-              <View style={styles.modalWrapperCreateCancel}>
-                <TouchableOpacity
-                  style={styles.modalBtnCreateCancel}
-                  onPress={clear}>
-                  <Text style={styles.modalBtnTextCreateCancel}>Close</Text>
-                </TouchableOpacity>
+            <View style={styles.modalWrapperCreateCancel}>
+              <TouchableOpacity
+                style={[GlobalStyle.btnUnclicked]}
+                onPress={clear}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <FontAwesome5
+                    style={{right: 8}}
+                    name={'times'}
+                    size={18}
+                    color={'#EF7373'}
+                  />
+                  <Text style={[GlobalStyle.btnCloseConfirmText]}>Close</Text>
+                </View>
+              </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={styles.modalBtnCreateCancel}
-                  onPress={Test}>
-                  <Text style={styles.modalBtnTextCreateCancel}>Test</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  disabled={noteTitle.length === 0}
-                  style={styles.modalBtnCreateCancel}
-                  onPress={Add ? addNote : () => UpdateInfo(itemEdit)}>
-                  <Text style={styles.modalBtnTextCreateCancel}>Confirm</Text>
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity
+                disabled={noteTitle.length === 0}
+                style={[GlobalStyle.btnUnclicked]}
+                onPress={Add ? addNote : () => UpdateInfo(itemEdit)}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <FontAwesome5
+                    style={{right: 5, top: 1}}
+                    name={'check'}
+                    size={15}
+                    color={'#FECA8C'}
+                  />
+                  <Text style={GlobalStyle.btnCloseConfirmText}>Confirm</Text>
+                </View>
+              </TouchableOpacity>
             </View>
           </View>
-        </Modal>
+        </View>
+      </Modal>
 
-        <TouchableOpacity style={styles.addBtn} onPress={onPressHandler}>
-          <FontAwesome5 name={'plus'} size={30} color={'#FECA8C'} />
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity style={styles.addBtn} onPress={onPressHandler}>
+        <FontAwesome5 name={'plus'} size={30} color={'#FECA8C'} />
+      </TouchableOpacity>
     </ImageBackground>
   );
 }
@@ -441,23 +412,24 @@ const styles = StyleSheet.create({
     margin: 10,
   },
 
-  flatList: {
-    position: 'absolute',
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    borderRadius: 30,
-    width: 360,
-    height: 50,
-    paddingHorizontal: 10,
-    top: 2,
-    left: 15,
-  },
-
   tagAddBtn: {
     position: 'absolute',
     top: 7,
     right: 15,
     width: 40,
     height: 40,
+    borderRadius: 30,
+    backgroundColor: '#636363',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+  },
+  tagAddBtn2: {
+    position: 'absolute',
+    top: 6,
+    right: 10,
+    width: 35,
+    height: 35,
     borderRadius: 30,
     backgroundColor: '#636363',
     justifyContent: 'center',
@@ -474,14 +446,42 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  tagListWrapperClicked: {
-    width: '98.1%',
-    borderRadius: 5,
-    top: 5,
-    flexDirection: 'row',
+
+  flatList: {
     position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    borderRadius: 30,
+    width: 360,
+    height: 50,
+    paddingHorizontal: 10,
+    top: 2,
+    left: 15,
+  },
+
+  flatListClicked: {
+    position: 'absolute',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    borderRadius: 30,
+    width: 360,
+    height: 50,
+    paddingHorizontal: 10,
+    top: 2,
+    right: 10,
+
+    alignItems: 'flex-start',
+  },
+
+  flatList2: {
+    paddingHorizontal: 10,
+    paddingRight: 20,
+  },
+
+  flatListClicked2: {
+    borderRadius: 30,
+    width: 360,
+    height: 50,
+    paddingHorizontal: 10,
+    alignItems: 'flex-end',
   },
 
   addBtn: {
@@ -502,10 +502,30 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.28)',
   },
   modalWrapper: {
+    width: '70%',
+    backgroundColor: '#3b3c3d',
+    borderRadius: 7,
+    margin: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  modalWrapperTitle: {
+    color: 'white',
+    fontSize: 20,
+    fontFamily: 'Poppins-SemiBold',
+    paddingTop: 10,
+  },
+  tagIco: {
+    marginTop: 5,
+    marginLeft: 10,
+  },
+  modalWrapperAdd: {
     width: '90%',
     backgroundColor: '#3b3c3d',
     borderRadius: 7,
     margin: 10,
+    justifyContent: 'center',
   },
   modalTitle: {
     borderColor: 'grey',
@@ -583,7 +603,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'grey',
     elevation: 5,
     height: 35,
-    width: 200,
+    width: 180,
   },
   tagText: {
     color: 'white',

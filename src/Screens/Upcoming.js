@@ -14,18 +14,33 @@ import {
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import firestore from '@react-native-firebase/firestore';
 import Todo2 from '../Elements/Todo2';
+import GlobalStyle from '../GlobalStyle';
 
 export default function Upcoming({navigation}) {
-  const upcoming = firestore()
+  const tommorowTasks = firestore()
     .collection('tasksDatabase')
     .where('tommorrow', '==', true)
     .where('complete', '==', false);
+
+  const somedayTasks = firestore()
+    .collection('tasksDatabase')
+    .where('someday', '==', true)
+    .where('complete', '==', false);
+
   const [todo, setTodo] = useState('');
   const [loading, setLoading] = useState(true);
   const [todos, setTodos] = useState([]);
+  const [empty, setEmpty] = useState();
+  const [empty2, setEmpty2] = useState();
+  const [showTommorow, setShowTommorow] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const [somedayTodo, setSomedayTodo] = useState('');
+  const [loading2, setLoading2] = useState(true);
+  const [somedayTodos, setSomedayTodos] = useState([]);
 
   useEffect(() => {
-    return upcoming.onSnapshot(querySnapshot => {
+    return tommorowTasks.onSnapshot(querySnapshot => {
       const list = [];
       querySnapshot.forEach(doc => {
         const {title, complete} = doc.data();
@@ -39,14 +54,40 @@ export default function Upcoming({navigation}) {
       if (loading) {
         setLoading(false);
       }
+      console.log(list.length);
+      if (list.length == 0) {
+        console.log('emptyyyy');
+        setEmpty(true);
+      } else {
+        setEmpty(false);
+      }
+    });
+  }, []);
+  useEffect(() => {
+    return somedayTasks.onSnapshot(querySnapshot => {
+      const list2 = [];
+      querySnapshot.forEach(doc => {
+        const {title, complete} = doc.data();
+        list2.push({
+          id: doc.id,
+          title,
+          complete,
+        });
+      });
+      setSomedayTodos(list2);
+      if (loading2) {
+        setLoading2(false);
+      }
+      if (list2.length == 0) {
+        console.log('emptyyyy');
+        setEmpty2(true);
+      } else {
+        setEmpty2(false);
+      }
     });
   }, []);
 
-  const showMe = () => {
-    console.log('hehe');
-  };
-
-  async function moveToToday(id, tommorrow) {
+  async function moveToTodayTom(id) {
     console.log('activate');
     await firestore().collection('tasksDatabase').doc(id).update({
       tommorrow: false,
@@ -54,9 +95,17 @@ export default function Upcoming({navigation}) {
     });
   }
 
+  async function moveToTodaySome(id) {
+    console.log('activate');
+    await firestore().collection('tasksDatabase').doc(id).update({
+      someday: false,
+      today: true,
+    });
+  }
+
   const deleteAll = () => {
     cont = true;
-    upcoming.onSnapshot(querySnapshot => {
+    tommorowTasks.onSnapshot(querySnapshot => {
       querySnapshot.forEach(doc => {
         if (cont) {
           doc.ref.delete();
@@ -72,46 +121,164 @@ export default function Upcoming({navigation}) {
     <ImageBackground
       source={require('../../assets/back.png')}
       style={styles.body}>
-      <View style={styles.body}>
-        {/* ToDo Elements in a flat list, actual element in todo.js  */}
-        <View style={styles.listaBe}>
+      <Modal
+        visible={modalVisible}
+        animationType={'fade'}
+        onRequestClose={() => setModalVisible(false)}
+        transparent>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.48)',
+          }}>
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '65%',
+              backgroundColor: '#3b3c3d',
+              borderRadius: 7,
+              margin: 10,
+            }}>
+            <Text
+              style={{
+                fontFamily: 'Poppins-Bold',
+                textAlign: 'center',
+                fontSize: 22,
+                color: '#FECA8C',
+              }}>
+              {' '}
+              Early-Access
+            </Text>
+            <Text
+              style={{
+                fontFamily: 'Poppins-Medium',
+                textAlign: 'center',
+                fontSize: 16,
+              }}>
+              This feauture will be added shortly
+            </Text>
+            <TouchableOpacity
+              style={[GlobalStyle.btnUnclicked]}
+              onPress={() => setModalVisible(false)}>
+              <View style={{alignItems: 'center', flexDirection: 'row'}}>
+                <FontAwesome5
+                  style={{right: 8}}
+                  name={'check-circle'}
+                  size={18}
+                  color={'#FECA8C'}
+                />
+                <Text style={[GlobalStyle.btnCloseConfirmText]}>Close</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {empty ? (
+        <View
+          style={{
+            backgroundColor: 'rgba(238, 199, 118, 0.47)',
+            borderRadius: 20,
+            padding: 10,
+            marginTop: 20,
+          }}>
+          <Text
+            style={{
+              fontFamily: 'Poppins-Bold',
+              color: 'black',
+              fontSize: 23,
+              textAlign: 'center',
+            }}>
+            Add upcoming tasks {'\n'} from Home Screen
+          </Text>
+        </View>
+      ) : (
+        <View></View>
+      )}
+      {/* ToDo Elements in a flat list, actual element in todo.js  */}
+
+      {showTommorow ? (
+        <View style={{flex: 1}}>
           <FlatList
             style={styles.flatList}
             data={todos}
             keyExtractor={item => item.id}
             renderItem={({item}) => (
               <Todo2
+                loadInfo={() => setModalVisible(true)}
                 title={item.title}
                 id={item.id}
-                tommorow={item.tommorow}
-                elFunction={() => moveToToday(item.id, item.tommorow)}
+                elFunction={() => moveToTodayTom(item.id)}
                 elIcon={'arrow-circle-up'}
               />
             )}
           />
         </View>
-
-        {/* Add to do modal */}
-        <View style={styles.addMenuParent}>
-          <View style={styles.addMenu}>
-            <TextInput
-              style={styles.addMenuTitle}
-              placeholder="Task title"
-              value={todo}
-              onChangeText={setTodo}></TextInput>
-            <TextInput
-              style={styles.addMenuDescription}
-              placeholder="Description"></TextInput>
-            <TouchableOpacity
-              disabled={todo.length === 0}
-              style={styles.btnText}>
-              <Text> Create Task </Text>
-            </TouchableOpacity>
-          </View>
+      ) : (
+        <View style={{flex: 1}}>
+          <FlatList
+            style={styles.flatList}
+            data={somedayTodos}
+            keyExtractor={item => item.id}
+            renderItem={({item}) => (
+              <Todo2
+                loadInfo={() => setModalVisible(true)}
+                title={item.title}
+                id={item.id}
+                elFunction={() => moveToTodaySome(item.id)}
+                elIcon={'arrow-circle-up'}
+              />
+            )}
+          />
         </View>
+      )}
 
-        {/* bulb button */}
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <TouchableOpacity
+          // disabled={todo.length === 0}
+          style={[
+            !showTommorow ? GlobalStyle.btnClicked : GlobalStyle.btnUnclicked,
+            {width: 150},
+          ]}
+          onPress={() => setShowTommorow(false)}>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <FontAwesome5
+              style={{right: 5}}
+              name={'moon'}
+              size={18}
+              color={'#FECA8C'}
+            />
+            <Text style={GlobalStyle.btnCloseConfirmText}>Someday</Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            showTommorow ? GlobalStyle.btnClicked : GlobalStyle.btnUnclicked,
+            {width: 150},
+          ]}
+          onPress={() => setShowTommorow(true)}>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <FontAwesome5
+              style={{right: 8}}
+              name={'sun'}
+              size={18}
+              color={'#FECA8C'}
+            />
+            <Text style={[GlobalStyle.btnCloseConfirmText]}>Tommorow</Text>
+          </View>
+        </TouchableOpacity>
       </View>
+
+      {/* bulb button */}
     </ImageBackground>
   );
 }
