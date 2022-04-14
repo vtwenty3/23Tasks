@@ -14,13 +14,13 @@ Before the start of the development process the app was carefully designed and r
 
 ### Login Screen
 
-![login](/figs/login.png)
+![login](/figs/login.png=x250)
 
 ### Notes Screen
-![notes](/figs/notes.png)
+![notes](/figs/notes.jpg)
 
 ### Tasks Home
-![tasks](/figs/tasks.png)
+![tasks](/figs/task.png)
 
 ### Upcoming Tasks
 ![upcoming](/figs/upcoming.png)
