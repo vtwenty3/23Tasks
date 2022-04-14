@@ -11,10 +11,9 @@ Before the start of the development process the app was carefully designed and r
 
 ![appflow](/figs/appflow.png)
 
-
 ### Login Screen
 
-![login](/figs/login.png | width=100)
+![login](/figs/login.png)
 
 ### Notes Screen
 ![notes](/figs/notes.jpg)
