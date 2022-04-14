@@ -1,7 +1,31 @@
 ## About
-The app aims to provide the user with the tools to quickly take notes and priorities tasks in a visualized easily to navigate way. The idea is inspired by the Kanban board, which is a tool for workflow visualization, widely used by Agile teams. 
+The App is developed to provide a simple to navigate, user-friendly UI, which gives the user the ability to quickly organize his tasks. Most of the apps out there are either too simple, lacking basic functionality or too complicated and off-putting. The aim of this app is to bridge this gap, providing the simple but power-ful technique for organizing tasks. Another feature of the app is a note-taking section, which can be used for storing ideas, thoughts, dreams, journals and etc. There is a functional tag – sorting system, which gives the user flexibility and organization power. 
 
 ## Design and Development
-The app is fully designed and develop by me. The design process was done using Figma. The app is developed with React-Native.
+The app has been firstly designed on Figma and step by step implemented using React Native style sheet. The app background is designed using Adobe Photoshop.  The look is in partly inspired by the famous todo app Todoist, but given the small timeframe i could not implement all the things I wanted. 
 
-## In App Screenshots
+
+## Software Design Chart
+
+Before the start of the development process the app was carefully designed and reiterated, to ensure that I can fully focus on the technical side, having clear goals and steps to follow. As always, the plan was not executed as imagined and some features and design ideas are missing, but they will be implemented in later stages of the development. 
+
+![appflow](/figs/appflow.png)
+
+
+### Login Screen
+
+![login](/figs/login.png)
+
+### Notes Screen
+![notes](/figs/notes.png)
+
+### Tasks Home
+![tasks](/figs/tasks.png)
+
+### Upcoming Tasks
+![upcoming](/figs/upcoming.png)
+
+### Done Tasks
+![done](/figs/done.png)
+
+
