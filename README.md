@@ -14,7 +14,7 @@ Before the start of the development process the app was carefully designed and r
 
 ### Login Screen
 
-![login](/figs/login.png width=100)
+![login](/figs/login.png | width=100)
 
 ### Notes Screen
 ![notes](/figs/notes.jpg)
