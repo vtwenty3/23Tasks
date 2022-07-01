@@ -19,18 +19,22 @@ Before the start of the development process the app was carefully designed and r
 ### Login Screen
 
 ![login](/figs/login.png)
-<img src="/figs/login.png" width="420" height="866" >
+<img src="/figs/login.png" width="363" height="677" >
 
 ### Notes Screen
 ![notes](/figs/notes.jpg)
+<img src="/figs/notes.png" width="363" height="677" >
 
 ### Tasks Home
 ![tasks](/figs/task.png)
+<img src="/figs/task.png" width="363" height="677" >
 
 ### Upcoming Tasks
 ![upcoming](/figs/upcoming.png)
+<img src="/figs/upcoming.png" width="363" height="677" >
 
 ### Done Tasks
 ![done](/figs/done.png)
+<img src="/figs/done.png" width="363" height="677" >
 
 
