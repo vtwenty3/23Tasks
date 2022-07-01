@@ -19,7 +19,7 @@ Before the start of the development process the app was carefully designed and r
 ### Login Screen
 
 ![login](/figs/login.png)
-<img src="/figs/login.png" width="480" height="720" >
+<img src="/figs/login.png" width="420" height="866" >
 
 ### Notes Screen
 ![notes](/figs/notes.jpg)
