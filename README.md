@@ -13,7 +13,7 @@ The app has been firstly designed on Figma and step by step implemented using Re
 
 Before the start of the development process the app was carefully designed and reiterated, to ensure that I can fully focus on the technical side, having clear goals and steps to follow. As always, the plan was not executed as imagined and some features and design ideas are missing, but they will be implemented in later stages of the development. 
 
-<img src="/figs/appflow.png" width="450" height="800">
+<img src="/figs/appflow.png" width="400" height="700">
 
 
 ### Login Screen
