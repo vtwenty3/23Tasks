@@ -1,6 +1,10 @@
 ## About
 The App is developed to provide a simple to navigate, user-friendly UI, which gives the user the ability to quickly organize his tasks. Most of the apps out there are either too simple, lacking basic functionality or too complicated and off-putting. The aim of this app is to bridge this gap, providing the simple but power-ful technique for organizing tasks. Another feature of the app is a note-taking section, which can be used for storing ideas, thoughts, dreams, journals and etc. There is a functional tag – sorting system, which gives the user flexibility and organization power. 
 
+## How to install the app?
+If you have an android phone simply download "app-debug.apk" file located in the root directory of the repo. 
+Upload it to your mobile device, enable "install from unknown sources" and install the apk file. 
+
 ## Design and Development
 The app has been firstly designed on Figma and step by step implemented using React Native style sheet. The app background is designed using Adobe Photoshop.  The look is in partly inspired by the famous todo app Todoist, but given the small timeframe i could not implement all the things I wanted. 
 
