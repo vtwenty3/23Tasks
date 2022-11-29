@@ -5,6 +5,24 @@ The App is developed to provide a simple to navigate, user-friendly UI, which gi
 If you have an android phone simply download "app-debug.apk" file located in the root directory of the repo. 
 Upload it to your mobile device, enable "install from unknown sources" and install the apk file. 
 
+### Login Screen
+
+<img src="/figs/login.png" width="360" height="677" >
+
+### Tasks Home
+<img src="/figs/task.png" width="363" height="677" >
+
+### Upcoming Tasks
+<img src="/figs/upcoming.png" width="363" height="677" >
+
+
+### Notes Screen
+<img src="/figs/notes.jpg" width="363" height="677" >
+
+
+### Done Tasks
+<img src="/figs/done.png" width="363" height="677" >
+
 ## Design and Development
 The app has been firstly designed on Figma and step by step implemented using React Native style sheet. The app background is designed using Adobe Photoshop.  The look is in partly inspired by the famous todo app Todoist, but given the small timeframe i could not implement all the things I wanted. 
 
@@ -16,20 +34,6 @@ Before the start of the development process the app was carefully designed and r
 <img src="/figs/appflow.png" width="363" height="677" >
 
 
-### Login Screen
 
-<img src="/figs/login.png" width="360" height="677" >
-
-### Notes Screen
-<img src="/figs/notes.jpg" width="363" height="677" >
-
-### Tasks Home
-<img src="/figs/task.png" width="363" height="677" >
-
-### Upcoming Tasks
-<img src="/figs/upcoming.png" width="363" height="677" >
-
-### Done Tasks
-<img src="/figs/done.png" width="363" height="677" >
 
 
