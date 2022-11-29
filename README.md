@@ -18,7 +18,7 @@ Before the start of the development process the app was carefully designed and r
 
 ### Login Screen
 
-<img src="/figs/login.png" width="363" height="677" >
+<img src="/figs/login.png" width="360" height="677" >
 
 ### Notes Screen
 <img src="/figs/notes.jpg" width="363" height="677" >
